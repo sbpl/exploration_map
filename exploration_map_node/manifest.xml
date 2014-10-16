@@ -1,0 +1,25 @@
+<package>
+  <description brief="exploration_map_node">
+
+     exploration_map_node
+
+  </description>
+  <author>Brian MacAllister</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/exploration_map_node</url>
+  
+  <depend package="std_msgs"/>
+  <depend package="rospy"/>
+  <depend package="roscpp"/>
+  <depend package="geometry_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="sensor_update"/>
+  <depend package="exploration_map"/>
+  <depend package="pcl_ros"/>
+  <depend package="tf"/>
+  <depend package="camera_node"/>
+
+</package>
+
+

@@ -1,0 +1,19 @@
+<package>
+  <description brief="sensor_update">
+
+     sensor_update
+
+  </description>
+  <author>Brian MacAllister</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/sensor_upate</url>
+  
+   <export>
+   <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lsensor_update"/>
+ </export>
+  
+
+</package>
+
+

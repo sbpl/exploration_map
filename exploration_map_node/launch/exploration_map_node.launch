@@ -1,0 +1,15 @@
+<launch>
+
+<node pkg="exploration_map_node" type="exploration_map_node" respawn="false" name="exploration_map_node" output="screen"   >
+
+<rosparam file = "$(find exploration_map_node)/config/exploration_map_node_config.yaml" command="load"  />
+
+</node>
+
+<node pkg="camera_node" type="camera_node" respawn="false" name="camera_scan_node"  >
+
+<rosparam file = "$(find camera_node)/config/camera_node_config.yaml" command="load" />
+
+</node>
+
+</launch>
