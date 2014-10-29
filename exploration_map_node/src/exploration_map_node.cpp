@@ -10,6 +10,8 @@
 exploration_map_node::exploration_map_node() :
 		n(), pn("~")
 {
+        camera_scan_counter = 0;
+        horizontal_lidar_scan_counter = 0;
 	ros_configure();
 	initialize_exploration_map();
 }
@@ -36,6 +38,7 @@ void exploration_map_node::ros_configure()
 	pn.getParam("occupancy_prob_threshold", occupancy_prob_thresh);
 	pn.getParam("camera_scan_topic_name", camera_scan_topic_name);
 	pn.getParam("map_publish_rate", map_publish_rate);
+        pn.getParam("number_of_scans_to_skip", number_of_scans_to_skip);
 
 	ROS_INFO("subscribed to %s and %s\n", horizontal_lidar_pose_tf_name.c_str(), horizontal_lidar_topic_name.c_str());
 	ROS_INFO("subscribed to %s and %s\n", camera_pose_tf_name.c_str(), camera_scan_topic_name.c_str());
@@ -57,6 +60,17 @@ void exploration_map_node::ros_configure()
 
 void exploration_map_node::horizontal_lidar_callback(const sensor_msgs::LaserScanConstPtr& msg)
 {
+        //skip scan if required
+        if(horizontal_lidar_scan_counter < number_of_scans_to_skip)
+        {
+           horizontal_lidar_scan_counter++;
+           return;
+        }
+        else
+        {
+          horizontal_lidar_scan_counter = 0;
+        }
+
 	geometry_msgs::PoseStamped pose;
 	if (!get_lateset_pose_from_tf(pose, horizontal_lidar_pose_tf_name))
 	{
@@ -73,10 +87,10 @@ void exploration_map_node::horizontal_lidar_callback(const sensor_msgs::LaserSca
 	sensor_update::lidar_update update(sense_pose, reading);
 
 	// publish transformed points
-	publish_sensor_update(update, horizontal_lidar_update_pub);
+	//publish_sensor_update(update, horizontal_lidar_update_pub);
 
 	// publish transformed cells
-	publish_sensor_update_ray_trace(update, horizontal_lidar_update_ray_trace_pub);
+	//publish_sensor_update_ray_trace(update, horizontal_lidar_update_ray_trace_pub);
 
 	//update exploration map
 	update_exploration_map(update);
@@ -235,6 +249,17 @@ bool exploration_map_node::update_exploration_map(const sensor_update::sensor_up
 
 void exploration_map_node::camera_scan_callback(const camera_node::camera_scanConstPtr& msg)
 {
+        //skip scan if required
+        if(camera_scan_counter < number_of_scans_to_skip)
+        {
+           camera_scan_counter++;
+           return;
+        }
+        else
+        {
+          camera_scan_counter = 0;
+        }
+
 	//get pose
 	geometry_msgs::PoseStamped pose;
 	if (!get_lateset_pose_from_tf(pose, camera_pose_tf_name))
@@ -252,10 +277,10 @@ void exploration_map_node::camera_scan_callback(const camera_node::camera_scanCo
 	sensor_update::camera_update update(sense_pose, reading);
 
 	// publish transformed points
-	publish_sensor_update(update, camera_update_pub);
+	//publish_sensor_update(update, camera_update_pub);
 
 	// publish transformed cells
-	publish_sensor_update_ray_trace(update, camera_update_ray_trace_pub);
+	//publish_sensor_update_ray_trace(update, camera_update_ray_trace_pub);
 
 	//update exploration map
 	update_exploration_map(update);

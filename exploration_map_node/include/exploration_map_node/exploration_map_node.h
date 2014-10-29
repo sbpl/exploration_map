@@ -92,6 +92,9 @@ private:
 	double occupancy_prob_thresh;
 	double lidar_update_increment;
 	double lidar_update_decrement;
+        int number_of_scans_to_skip;
+        int camera_scan_counter;
+        int horizontal_lidar_scan_counter;
 
 	//node handles
 	ros::NodeHandle n;
