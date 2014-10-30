@@ -54,6 +54,8 @@ private:
 	 */
 	void horizontal_lidar_callback(const sensor_msgs::LaserScanConstPtr & msg);
 
+	void vertical_lidar_callback(const sensor_msgs::LaserScanConstPtr & msg);
+
 	void camera_scan_callback(const camera_node::camera_scanConstPtr & msg);
 
 	void map_publish_timer_callback(const ros::TimerEvent & event);
@@ -82,19 +84,23 @@ private:
 	geometry_msgs::Point map_origin;
 	int map_size_x;
 	int map_size_y;
+	int map_size_z;
 	std::string frame_name;
 	std::string horizontal_lidar_pose_tf_name;
+	std::string vertical_lidar_pose_tf_name;
 	std::string camera_pose_tf_name;
 	std::string horizontal_lidar_topic_name;
+	std::string vertical_lidar_topic_name;
 	std::string camera_scan_topic_name;
 	double map_publish_rate;
 
 	double occupancy_prob_thresh;
 	double lidar_update_increment;
 	double lidar_update_decrement;
-        int number_of_scans_to_skip;
-        int camera_scan_counter;
-        int horizontal_lidar_scan_counter;
+	int number_of_scans_to_skip;
+	int camera_scan_counter;
+	int horizontal_lidar_scan_counter;
+	int vertical_lidar_scan_counter;
 
 	//node handles
 	ros::NodeHandle n;
@@ -103,6 +109,7 @@ private:
 
 	//ros subscriber
 	ros::Subscriber horiz_lidar_sub;
+	ros::Subscriber verti_lidar_sub;
 	ros::Subscriber camera_scan_sub;
 
 	//ros timer
@@ -111,14 +118,13 @@ private:
 	//ros publishers
 	ros::Publisher horizontal_lidar_update_pub;
 	ros::Publisher horizontal_lidar_update_ray_trace_pub;
+	ros::Publisher vertical_lidar_update_pub;
+	ros::Publisher vertical_lidar_update_ray_trace_pub;
 	ros::Publisher camera_update_pub;
 	ros::Publisher camera_update_ray_trace_pub;
 	ros::Publisher exploration_map_pub;
 
-
 	exploration_map::exploration_map exp_map;
-
-
 
 };
 
