@@ -110,13 +110,20 @@ public:
 	orientation ori;
 };
 
+class sensor_angle
+{
+public:
+	double yaw;
+	double roll;
+};
+
 /**
  *
  */
 class sensor_ray
 {
 public:
-	double angle;
+	sensor_angle angle;
 	double distance;
 };
 
@@ -169,7 +176,7 @@ public:
 	 *
 	 * @param trans_sensor_ends
 	 */
-	bool get_transformed_sensor_ends(std::vector<position> & trans_sensor_ends) const;
+	virtual bool get_transformed_sensor_ends(std::vector<position> & trans_sensor_ends) const;
 
 	/**
 	 *
@@ -189,6 +196,8 @@ private:
 	 * @return
 	 */
 	virtual int get_ray_cost(double distance, double end_distance) const = 0;
+
+protected:
 
 	pose pose_;
 	sensor_reading reading_;
@@ -227,6 +236,9 @@ public:
 	camera_update();
 
 	camera_update(pose pose, sensor_reading reading);
+
+	bool get_transformed_sensor_ends(std::vector<position> & trans_sensor_ends) const;
+
 
 	sensor_update_type get_type() const;
 

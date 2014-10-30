@@ -28,14 +28,14 @@ orientation normalize(orientation ori)
 	return ori;
 }
 
-void normalize(double q [4])
+void normalize(double q[4])
 {
-	double q_mag = sqrt(q[0]*q[0] + q[1]*q[1] + q[2]*q[2] + q[3]*q[3]  );
+	double q_mag = sqrt(q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3]);
 	q[0] /= q_mag;
 	q[1] /= q_mag;
 	q[2] /= q_mag;
 	q[3] /= q_mag;
-	q_mag = sqrt(q[0]*q[0] + q[1]*q[1] + q[2]*q[2] + q[3]*q[3]  );
+	q_mag = sqrt(q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3]);
 }
 
 void quaternion_multiply(const double r[4], const double q[4], double f[4])
@@ -55,11 +55,9 @@ orientation rotate_orientation(orientation one, orientation two)
 	double f[4] =
 	{ 0, 0, 0, 0 };
 	quaternion_multiply(r, q, f);
-	orientation three	( f );
+	orientation three(f);
 	return three;
 }
-
-
 
 void quaternion_conjugate(const double r[4], double q[4])
 {
@@ -88,8 +86,8 @@ position rotate_position(position pos, orientation ori)
 	{ ori.w, ori.x, ori.y, ori.z };
 	double qi[4];
 	quaternion_inverse(q, qi);
-	double p1 [4];
-	double p2 [4];
+	double p1[4];
+	double p2[4];
 
 	quaternion_multiply(q, p, p1);
 	quaternion_multiply(p1, qi, p2);
@@ -99,7 +97,6 @@ position rotate_position(position pos, orientation ori)
 	pos.z = p2[3];
 	return pos;
 }
-
 
 position transform_position(position pos, pose p)
 {
@@ -114,15 +111,14 @@ position transform_position(position pos, pose p)
 	return pos;
 }
 
-
 void convert_eular_to_quaterion(double roll, double pitch, double yaw, double q[4])
 {
 	double eps = 0.00000000001;
-	double q_den = sqrt( cos(pitch)*cos(roll) + cos(pitch)*cos(yaw) + cos(roll)*cos(yaw) + sin(pitch)*sin(roll)*sin(yaw) + 1) + eps   ;
-	q[0] =  q_den / 2;
-	q[1] = ( cos(pitch)*sin(roll) + cos(yaw)*sin(roll) - cos(roll)*sin(pitch)*sin(yaw)) / (2 * q_den) ;
-	q[2] =  ( sin(pitch) + sin(roll)*sin(yaw) +cos(roll)*cos(yaw)*sin(pitch) ) / (2 * q_den);
-	q[3] =   (cos(pitch)*sin(yaw) + cos(roll)*sin(yaw) - cos(yaw)*sin(pitch)*sin(roll)) / (2 * q_den);
+	double q_den = sqrt(cos(pitch) * cos(roll) + cos(pitch) * cos(yaw) + cos(roll) * cos(yaw) + sin(pitch) * sin(roll) * sin(yaw) + 1) + eps;
+	q[0] = q_den / 2;
+	q[1] = (cos(pitch) * sin(roll) + cos(yaw) * sin(roll) - cos(roll) * sin(pitch) * sin(yaw)) / (2 * q_den);
+	q[2] = (sin(pitch) + sin(roll) * sin(yaw) + cos(roll) * cos(yaw) * sin(pitch)) / (2 * q_den);
+	q[3] = (cos(pitch) * sin(yaw) + cos(roll) * sin(yaw) - cos(yaw) * sin(pitch) * sin(roll)) / (2 * q_den);
 	normalize(q);
 }
 
@@ -153,17 +149,15 @@ bool sensor_update::get_transformed_sensor_ends(std::vector<position>& trans_sen
 	std::vector<position> sensor_end_pos;
 	for (size_t i = 0; i < reading_.rays.size(); i++)
 	{
-		double yaw = reading_.rays[i].angle;
+		double yaw = reading_.rays[i].angle.yaw;
+		double roll = reading_.rays[i].angle.roll;
 		double distance = reading_.rays[i].distance;
 		double base_quat[4];
-		convert_eular_to_quaterion(0, 0, yaw, base_quat);
-//		printf("%d yaw is %f ...",(int) i, yaw);
+		convert_eular_to_quaterion(roll, 0, yaw, base_quat);
 		orientation base_orient(base_quat);
 		position base_pos(distance, 0, 0);
 		position pos = rotate_position(base_pos, base_orient);
 		sensor_end_pos.push_back(pos);
-//		printf("%d sensor %f %f %f distance %f\n", (int)i, pos.x, pos.y, pos.z, distance);
-		//printf("%d: original quaternion %f %f %f %f\n", (int)i, base_quat[0],base_quat[1],base_quat[2],base_quat[3]);
 	}
 
 	//transform ends to pose taken with scan
@@ -172,7 +166,6 @@ bool sensor_update::get_transformed_sensor_ends(std::vector<position>& trans_sen
 		a = transform_position(a, pose_);
 		trans_sensor_ends.push_back(a);
 	}
-
 
 	return true;
 }
@@ -203,6 +196,7 @@ bool sensor_update::get_discrete_ray_trace_cells(double resolution, std::vector<
 		double dx = ray_end.x / max_distance;
 		double dy = ray_end.y / max_distance;
 		double dz = ray_end.z / max_distance;
+
 		while (true)
 		{
 			//Add new cell
@@ -243,7 +237,7 @@ bool sensor_update::get_discrete_ray_trace_cells(double resolution, std::vector<
 
 int lidar_update::get_ray_cost(double distance, double end_distance) const
 {
-	if(distance < end_distance)
+	if (distance < end_distance)
 	{
 		return 0;
 	}
@@ -253,12 +247,14 @@ int lidar_update::get_ray_cost(double distance, double end_distance) const
 	}
 }
 
-lidar_update::lidar_update():sensor_update()
+lidar_update::lidar_update() :
+		sensor_update()
 {
 
 }
 
-lidar_update::lidar_update(pose pose, sensor_reading reading):sensor_update(pose,reading)
+lidar_update::lidar_update(pose pose, sensor_reading reading) :
+		sensor_update(pose, reading)
 {
 
 }
@@ -277,7 +273,8 @@ camera_update::camera_update()
 {
 }
 
-camera_update::camera_update(pose pose, sensor_reading reading):sensor_update(pose,reading)
+camera_update::camera_update(pose pose, sensor_reading reading) :
+		sensor_update(pose, reading)
 {
 }
 
@@ -298,4 +295,45 @@ pose sensor_update::get_pose() const
 
 }
 
+bool sensor_update::camera_update::get_transformed_sensor_ends(std::vector<position>& trans_sensor_ends) const
+{
 
+	//sanity check
+	if (reading_.rays.size() == 0)
+	{
+		return false;
+	}
+
+	//create position for each distance/angle pair given pose
+	std::vector<position> sensor_end_pos;
+	for (size_t i = 0; i < reading_.rays.size(); i++)
+	{
+		double yaw = reading_.rays[i].angle.yaw;
+		double roll = reading_.rays[i].angle.roll;
+		double distance = reading_.rays[i].distance;
+		double base_quat[4];
+
+		//rotate on yaw
+		convert_eular_to_quaterion(0, 0, yaw, base_quat);
+		orientation base_orient1(base_quat);
+		position base_pos(distance, 0, 0);
+		position pos = rotate_position(base_pos, base_orient1);
+
+		//rotate on roll
+		convert_eular_to_quaterion(roll, 0, 0, base_quat);
+		orientation base_orient2(base_quat);
+		pos = rotate_position(pos, base_orient2);
+
+		//add
+		sensor_end_pos.push_back(pos);
+	}
+
+	//transform ends to pose taken with scan
+	for (auto a : sensor_end_pos)
+	{
+		a = transform_position(a, pose_);
+		trans_sensor_ends.push_back(a);
+	}
+
+	return true;
+}
