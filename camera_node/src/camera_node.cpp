@@ -43,25 +43,34 @@ void camera_scan_node::camera_image_callback(const sensor_msgs::ImageConstPtr ms
 	camera_node::camera_scan cam_scan;
 	cam_scan.header = im.header;
 	cam_scan.image_data = im;
-	cam_scan.angle_increment = sensor_angular_resolution;
-	cam_scan.angle_max = sensor_field_of_view_rad / 2;
-	cam_scan.angle_min = -sensor_field_of_view_rad /2 ;
+	cam_scan.yaw_angle_increment = sensor_angular_resolution;
+	cam_scan.yaw_angle_max = sensor_field_of_view_rad / 2;
+	cam_scan.yaw_angle_min = -sensor_field_of_view_rad /2 ;
+	cam_scan.roll_angle_increment = sensor_angular_resolution;
+	cam_scan.roll_angle_min = 0;
+	cam_scan.roll_angle_max = M_PI;
 	cam_scan.range_max = sensor_distance;
 	cam_scan.range_min = sensor_distance;
 
 	//generate ranges
-	double current_ang = cam_scan.angle_min;
+	double current_ang = cam_scan.yaw_angle_min;
+	double current_roll_ang = cam_scan.roll_angle_min;
 	while(true)
 	{
 		double d = sensor_distance;
 		cam_scan.ranges.push_back(d);
 
-		if(current_ang >=  cam_scan.angle_max)
+		if(current_ang >=  cam_scan.yaw_angle_max)
 		{
-			break;
+			current_ang = cam_scan.yaw_angle_min;
+			current_roll_ang += cam_scan.roll_angle_increment;
+			if(current_roll_ang >= cam_scan.roll_angle_max)
+			{
+				break;
+			}
 		}
 
-		current_ang += cam_scan.angle_increment;
+		current_ang += cam_scan.yaw_angle_increment;
 	}
 	//publish cam scan
 	publish_camera_scan(cam_scan);
