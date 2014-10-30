@@ -35,6 +35,7 @@ class point
 public:
 	double x;
 	double y;
+	double z;
 };
 
 class cell
@@ -42,6 +43,7 @@ class cell
 public:
 	int X;
 	int Y;
+	int Z;
 };
 
 class cell_list
@@ -66,42 +68,45 @@ public:
 	 */
 	generic_map();
 
+
 	/**
 	 *
 	 * @param _resolution
 	 * @param _size_x
 	 * @param _size_y
+	 * @param _size_z
 	 */
-	generic_map(double _resolution, int _size_x, int _size_y);
+	generic_map(double _resolution, int _size_x, int _size_y, int _size_z);
 
 	/**
 	 *
 	 */
 	~generic_map();
 
-	void initialize(double _resolution, int _size_x, int _size_y);
+	void initialize(double _resolution, int _size_x, int _size_y, int _size_z);
 
-	void initialize(double _resolution, int _size_x, int _size_y, T _default_value);
+	void initialize(double _resolution, int _size_x, int _size_y, int _size_z, T _default_value);
 
-	std::vector<T> & operator[](int x)
+	std::vector< std::vector<T> > & operator[](int x)
 	{
 		return map_[x];
 	}
 
-	const std::vector<T> & operator[](int x) const
+	const std::vector< std::vector<T> > & operator[](int x) const
 	{
 		return map_[x];
 	}
 
-	T at(int x, int y) const
+	T at(int x, int y, int z) const
 	{
-		return map_.at(x).at(y);
+		return map_.at(x).at(y).at(z);
 	}
 
-	std::vector<std::vector<T> > map_;
+	std::vector<std::vector< std::vector<T> > > map_;
 	double resolution;
 	int size_x;
 	int size_y;
+	int size_z;
 };
 
 /**
@@ -116,11 +121,13 @@ public:
 		resolution = 0;
 		size_x = 0;
 		size_y = 0;
+		size_z = 0;
 	}
 
 	double resolution;
 	int size_x;
 	int size_y;
+	int size_z;
 	point origin;
 
 };
@@ -168,9 +175,7 @@ public:
 
 	/**
 	 *
-	 * @param _resolution
-	 * @param _size_x
-	 * @param _size_y
+	 * @param _config
 	 */
 	exploration_map(config _config);
 
@@ -181,9 +186,7 @@ public:
 
 	/**
 	 *
-	 * @param _resolution
-	 * @param _size_x
-	 * @param _size_y
+	 * @param _config
 	 * @return
 	 */
 	bool initialize(config _config);

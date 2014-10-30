@@ -63,15 +63,17 @@ bool exploration_map::exploration_map::initialize(config _config)
 	config_ = _config;
 	origin_cell_.X = discretize(config_.map_config_.origin.x, config_.map_config_.resolution);
 	origin_cell_.Y = discretize(config_.map_config_.origin.y, config_.map_config_.resolution);
+	origin_cell_.Z = discretize(config_.map_config_.origin.z, config_.map_config_.resolution);
 
 	//initialize maps
 	double resolution = config_.map_config_.resolution;
 	int size_x = config_.map_config_.size_x;
 	int size_y = config_.map_config_.size_y;
+	int size_z = config_.map_config_.size_z;
 
-	exp_map.initialize(resolution, size_x, size_y);
-	occupancy_map.initialize(resolution, size_x, size_y, 0.5);
-	observation_map.initialize(resolution,size_x,size_y, 0);
+	exp_map.initialize(resolution, size_x, size_y, size_z);
+	occupancy_map.initialize(resolution, size_x, size_y, size_z, 0.5);
+	observation_map.initialize(resolution,size_x,size_y, size_z, 0);
 	return true;
 }
 
@@ -88,6 +90,7 @@ bool exploration_map::exploration_map::update_occupancy_map(const sensor_update:
 		cell current_cell;
 		current_cell.X = a.X;
 		current_cell.Y = a.Y;
+		current_cell.Z = a.Z;
 
 		//get cell in map frame
 		current_cell = map_frame(current_cell);
@@ -98,7 +101,7 @@ bool exploration_map::exploration_map::update_occupancy_map(const sensor_update:
 			continue;
 		}
 
-		double prev_val = occupancy_map[current_cell.X][current_cell.Y];
+		double prev_val = occupancy_map[current_cell.X][current_cell.Y][current_cell.Z];
 
 		//update
 		double new_value = prev_val;
@@ -112,7 +115,7 @@ bool exploration_map::exploration_map::update_occupancy_map(const sensor_update:
 		}
 		new_value = std::max(std::min(new_value, 1.0), 0.0);
 
-		occupancy_map[current_cell.X][current_cell.Y] = new_value;
+		occupancy_map[current_cell.X][current_cell.Y][current_cell.Z] = new_value;
 
 		//if cell update add to updated list
 		if (new_value != prev_val)
@@ -134,6 +137,11 @@ bool exploration_map::exploration_map::is_in_bounds(const cell& c)
 	{
 		return false;
 	}
+	if (c.Z < 0 || c.Z >= config_.map_config_.size_z)
+	{
+		return false;
+	}
+
 	return true;
 }
 
@@ -142,6 +150,7 @@ exploration_map::cell exploration_map::exploration_map::map_frame(const cell& c)
 	cell k;
 	k.X = c.X - origin_cell_.X;
 	k.Y = c.Y - origin_cell_.Y;
+	k.Z = c.Z - origin_cell_.Z;
 	return k;
 }
 
@@ -154,26 +163,26 @@ bool exploration_map::exploration_map::update_exploration_map(const cell_list& u
 		bool explored = false;
 
 		//check occupancy
-		if (occupancy_map[a.X][a.Y] > config_.occ_map_config_.occ_threshold)
+		if (occupancy_map[a.X][a.Y][a.Z] > config_.occ_map_config_.occ_threshold)
 		{
 			occupied = true;
 		}
 
 		//check if explored
-		if(observation_map[a.X][a.Y] > 0)
+		if(observation_map[a.X][a.Y][a.Z] > 0)
 		{
 			explored = true;
 		}
 
 		//update value
-		exp_map[a.X][a.Y] = exploration_type::unknown;
+		exp_map[a.X][a.Y][a.Z] = exploration_type::unknown;
 		if (explored)
 		{
-			exp_map[a.X][a.Y] = exploration_type::explored;
+			exp_map[a.X][a.Y][a.Z] = exploration_type::explored;
 		}
 		if (occupied)
 		{
-			exp_map[a.X][a.Y] = exploration_type::occupied;
+			exp_map[a.X][a.Y][a.Z] = exploration_type::occupied;
 		}
 	}
 	return true;
@@ -201,6 +210,7 @@ bool exploration_map::exploration_map::update_observation_map(const sensor_updat
 	cell root_cell;
 	root_cell.X = discretize(sensor_pose.pos.x,config_.map_config_.resolution);
 	root_cell.Y = discretize(sensor_pose.pos.y,config_.map_config_.resolution);
+	root_cell.Z = discretize(sensor_pose.pos.z,config_.map_config_.resolution);
 	root_cell = map_frame(root_cell);
 
 	for (auto a : cells)
@@ -210,6 +220,7 @@ bool exploration_map::exploration_map::update_observation_map(const sensor_updat
 		cell current_cell;
 		current_cell.X = a.X;
 		current_cell.Y = a.Y;
+		current_cell.Z = a.Z;
 
 		//get cell in map frame
 		current_cell = map_frame(current_cell);
@@ -221,13 +232,13 @@ bool exploration_map::exploration_map::update_observation_map(const sensor_updat
 		}
 
 		//Store previous value
-		double prev_val = observation_map[current_cell.X][current_cell.Y];
+		double prev_val = observation_map[current_cell.X][current_cell.Y][current_cell.Z];
 
 
 		//Reset through point flag if current cell near origin
 		if(skip_through_points)
 		{
-			if( abs(root_cell.X - current_cell.X) < 2 && abs(root_cell.Y - current_cell.Y) < 2)
+			if( abs(root_cell.X - current_cell.X) < 2 && abs(root_cell.Y - current_cell.Y) < 2 && abs(root_cell.Z - current_cell.Z ) < 2 )
 			{
 				skip_through_points = false;
 			}
@@ -239,7 +250,7 @@ bool exploration_map::exploration_map::update_observation_map(const sensor_updat
 			continue;
 		}
 
-		if(exp_map[current_cell.X][current_cell.Y] == exploration_type::occupied)
+		if(exp_map[current_cell.X][current_cell.Y][current_cell.Z] == exploration_type::occupied)
 		{
 			skip_through_points = true;
 			continue;
@@ -247,7 +258,7 @@ bool exploration_map::exploration_map::update_observation_map(const sensor_updat
 
 		//update value of observation
 		double new_value = 1;
-		observation_map[current_cell.X][current_cell.Y] = new_value;
+		observation_map[current_cell.X][current_cell.Y][current_cell.Z] = new_value;
 
 		//if cell update add to updated list
 		if (new_value != prev_val)
