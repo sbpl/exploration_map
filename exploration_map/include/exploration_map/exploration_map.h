@@ -27,7 +27,7 @@ namespace exploration_map
  */
 enum class exploration_type
 {
-	unknown, explored, occupied
+	unknown, explored, occupied, unoccupied
 };
 
 class point
@@ -122,12 +122,14 @@ public:
 		size_x = 0;
 		size_y = 0;
 		size_z = 0;
+		base_height = 0;
 	}
 
 	double resolution;
 	int size_x;
 	int size_y;
 	int size_z;
+	int base_height;
 	point origin;
 
 };
@@ -144,11 +146,13 @@ public:
 		update_increment_value = 0;
 		update_decrement_value = 0;
 		occ_threshold = 0;
+		unnoc_threshold = 0;
 	}
 
 	double update_increment_value;
 	double update_decrement_value;
 	double occ_threshold;
+	double unnoc_threshold;
 };
 
 /**

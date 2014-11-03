@@ -95,12 +95,15 @@ private:
 	double map_publish_rate;
 
 	double occupancy_prob_thresh;
+	double unnocupied_prob_thresh;
 	double lidar_update_increment;
 	double lidar_update_decrement;
 	int number_of_scans_to_skip;
 	int camera_scan_counter;
 	int horizontal_lidar_scan_counter;
 	int vertical_lidar_scan_counter;
+	int base_height_discrete;
+	bool publish_debug_messages;
 
 	//node handles
 	ros::NodeHandle n;

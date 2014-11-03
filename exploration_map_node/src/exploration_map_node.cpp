@@ -44,10 +44,14 @@ void exploration_map_node::ros_configure()
 	pn.getParam("camera_scan_topic_name", camera_scan_topic_name);
 	pn.getParam("map_publish_rate", map_publish_rate);
 	pn.getParam("number_of_scans_to_skip", number_of_scans_to_skip);
+	pn.getParam("base_height_disc", base_height_discrete);
+	pn.getParam("unnocupied_prob_threshold", unnocupied_prob_thresh);
+	pn.getParam("publish_debug_messages", publish_debug_messages);
 
 	ROS_INFO("subscribed to %s and %s\n", horizontal_lidar_pose_tf_name.c_str(), horizontal_lidar_topic_name.c_str());
 	ROS_INFO("subscribed to %s and %s\n", camera_pose_tf_name.c_str(), camera_scan_topic_name.c_str());
 	ROS_INFO("subscribed to %s and %s\n", vertical_lidar_pose_tf_name.c_str(), vertical_lidar_topic_name.c_str());
+	ROS_INFO("publish debugging messages (%d) \n", publish_debug_messages);
 
 	//subscribe
 	horiz_lidar_sub = n.subscribe(horizontal_lidar_topic_name, 1, &exploration_map_node::horizontal_lidar_callback, this);
@@ -95,11 +99,14 @@ void exploration_map_node::horizontal_lidar_callback(const sensor_msgs::LaserSca
 	convert_laser_scan_to_sensor_update_ray(scan, reading);
 	sensor_update::lidar_update update(sense_pose, reading);
 
-	// publish transformed points
-	publish_sensor_update(update, horizontal_lidar_update_pub);
+	if (publish_debug_messages)
+	{
+		// publish transformed points
+		publish_sensor_update(update, horizontal_lidar_update_pub);
 
-	// publish transformed cells
-	publish_sensor_update_ray_trace(update, horizontal_lidar_update_ray_trace_pub);
+		// publish transformed cells
+		publish_sensor_update_ray_trace(update, horizontal_lidar_update_ray_trace_pub);
+	}
 
 	//update exploration map
 	update_exploration_map(update);
@@ -242,11 +249,13 @@ bool exploration_map_node::initialize_exploration_map()
 	con.map_config_.size_x = map_size_x;
 	con.map_config_.size_y = map_size_y;
 	con.map_config_.size_z = map_size_z;
+	con.map_config_.base_height = base_height_discrete;
 
 	//occupancy related config
 	con.occ_map_config_.occ_threshold = occupancy_prob_thresh;
 	con.occ_map_config_.update_decrement_value = lidar_update_decrement;
 	con.occ_map_config_.update_increment_value = lidar_update_increment;
+	con.occ_map_config_.unnoc_threshold = unnocupied_prob_thresh;
 
 	exp_map.initialize(con);
 
@@ -288,11 +297,14 @@ void exploration_map_node::camera_scan_callback(const camera_node::camera_scanCo
 	convert_camera_scan_to_sensor_update_ray(scan, reading);
 	sensor_update::camera_update update(sense_pose, reading);
 
-	// publish transformed points
-	publish_sensor_update(update, camera_update_pub);
+	if (publish_debug_messages)
+	{
+		// publish transformed points
+		publish_sensor_update(update, camera_update_pub);
 
-	// publish transformed cells
-	publish_sensor_update_ray_trace(update, camera_update_ray_trace_pub);
+		// publish transformed cells
+		publish_sensor_update_ray_trace(update, camera_update_ray_trace_pub);
+	}
 
 	//update exploration map
 	update_exploration_map(update);
@@ -369,11 +381,14 @@ void exploration_map_node::vertical_lidar_callback(const sensor_msgs::LaserScanC
 	convert_laser_scan_to_sensor_update_ray(scan, reading);
 	sensor_update::lidar_update update(sense_pose, reading);
 
-	// publish transformed points
-	publish_sensor_update(update, vertical_lidar_update_pub);
+	if (publish_debug_messages)
+	{
+		// publish transformed points
+		publish_sensor_update(update, vertical_lidar_update_pub);
 
-	// publish transformed cells
-	publish_sensor_update_ray_trace(update, vertical_lidar_update_ray_trace_pub);
+		// publish transformed cells
+		publish_sensor_update_ray_trace(update, vertical_lidar_update_ray_trace_pub);
+	}
 
 	//update exploration map
 	update_exploration_map(update);

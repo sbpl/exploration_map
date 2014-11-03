@@ -6,6 +6,8 @@
   map_size_x: 600
   map_size_y: 300
   map_size_z: 100
+  base_height_disc: 5
+  unnocupied_prob_threshold: 0.3
   occupancy_prob_threshold: 0.8
   lidar_update_increment: 0.9
   lidar_update_decrement: 0.05
@@ -20,3 +22,4 @@
   
   map_publish_rate: 6.0
   number_of_scans_to_skip: 1
+  publish_debug_messages: false

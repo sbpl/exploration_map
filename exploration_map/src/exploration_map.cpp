@@ -41,7 +41,7 @@ bool exploration_map::exploration_map::update_map(const sensor_update::sensor_up
 	case sensor_update::sensor_update_type::camera:
 	{
 		auto camera_update = dynamic_cast<const sensor_update::camera_update&>(update);
-		update_observation_map(camera_update,updated_cells);
+		update_observation_map(camera_update, updated_cells);
 		break;
 	}
 	default:
@@ -73,7 +73,7 @@ bool exploration_map::exploration_map::initialize(config _config)
 
 	exp_map.initialize(resolution, size_x, size_y, size_z);
 	occupancy_map.initialize(resolution, size_x, size_y, size_z, 0.5);
-	observation_map.initialize(resolution,size_x,size_y, size_z, 0);
+	observation_map.initialize(resolution, size_x, size_y, size_z, 0);
 	return true;
 }
 
@@ -161,6 +161,7 @@ bool exploration_map::exploration_map::update_exploration_map(const cell_list& u
 	{
 		bool occupied = false;
 		bool explored = false;
+		bool unoccupied = false;
 
 		//check occupancy
 		if (occupancy_map[a.X][a.Y][a.Z] > config_.occ_map_config_.occ_threshold)
@@ -168,8 +169,13 @@ bool exploration_map::exploration_map::update_exploration_map(const cell_list& u
 			occupied = true;
 		}
 
+		if (occupancy_map[a.X][a.Y][a.Z] < config_.occ_map_config_.unnoc_threshold)
+		{
+			unoccupied = true;
+		}
+
 		//check if explored
-		if(observation_map[a.X][a.Y][a.Z] > 0)
+		if (observation_map[a.X][a.Y][a.Z] > 0)
 		{
 			explored = true;
 		}
@@ -183,6 +189,10 @@ bool exploration_map::exploration_map::update_exploration_map(const cell_list& u
 		if (occupied)
 		{
 			exp_map[a.X][a.Y][a.Z] = exploration_type::occupied;
+		}
+		if (unoccupied)
+		{
+			exp_map[a.X][a.Y][a.Z] = exploration_type::unoccupied;
 		}
 	}
 	return true;
@@ -203,15 +213,17 @@ bool exploration_map::exploration_map::update_observation_map(const sensor_updat
 	//todo: have this function return cells that line up with frame
 	update.get_discrete_ray_trace_cells(config_.map_config_.resolution, cells);
 
-
 	bool skip_through_points = false;
 
 	sensor_update::pose sensor_pose = update.get_pose();
 	cell root_cell;
-	root_cell.X = discretize(sensor_pose.pos.x,config_.map_config_.resolution);
-	root_cell.Y = discretize(sensor_pose.pos.y,config_.map_config_.resolution);
-	root_cell.Z = discretize(sensor_pose.pos.z,config_.map_config_.resolution);
+	root_cell.X = discretize(sensor_pose.pos.x, config_.map_config_.resolution);
+	root_cell.Y = discretize(sensor_pose.pos.y, config_.map_config_.resolution);
+	root_cell.Z = discretize(sensor_pose.pos.z, config_.map_config_.resolution);
 	root_cell = map_frame(root_cell);
+
+	//assuming base level is the only level that matters for determining traversability
+	int base_level = config_.map_config_.base_height;
 
 	for (auto a : cells)
 	{
@@ -234,23 +246,30 @@ bool exploration_map::exploration_map::update_observation_map(const sensor_updat
 		//Store previous value
 		double prev_val = observation_map[current_cell.X][current_cell.Y][current_cell.Z];
 
-
 		//Reset through point flag if current cell near origin
-		if(skip_through_points)
+		if (skip_through_points)
 		{
-			if( abs(root_cell.X - current_cell.X) < 2 && abs(root_cell.Y - current_cell.Y) < 2 && abs(root_cell.Z - current_cell.Z ) < 2 )
+			if (abs(root_cell.X - current_cell.X) < 2 && abs(root_cell.Y - current_cell.Y) < 2 && abs(root_cell.Z - current_cell.Z) < 2)
 			{
 				skip_through_points = false;
 			}
 		}
 
 		//Skip this value if it was considered a through point
-		if(skip_through_points)
+		if (skip_through_points)
 		{
 			continue;
 		}
 
-		if(exp_map[current_cell.X][current_cell.Y][current_cell.Z] == exploration_type::occupied)
+		//Start skipping points if current point goes over impassable terrain
+		if (exp_map[current_cell.X][current_cell.Y][base_level] == exploration_type::occupied)
+		{
+			skip_through_points = true;
+			continue;
+		}
+
+		//Start skipping points if current point goes over unknown terrain
+		if( exp_map[current_cell.X][current_cell.Y][base_level] == exploration_type::unknown)
 		{
 			skip_through_points = true;
 			continue;
