@@ -13,13 +13,13 @@
 #include <iostream>
 #include <algorithm>
 #include <sensor_update/sensor_update.h>
+#include <generic_transform/generic_transform.h>
 #include <algorithm>
-
 
 /**
  *
  */
-namespace exploration_map
+namespace exploration
 {
 
 /**
@@ -36,6 +36,76 @@ public:
 	double x;
 	double y;
 	double z;
+
+	point()
+	{
+		x = 0;
+		y = 0;
+		z = 0;
+	}
+	point(const point & _p)
+	{
+		x = _p.x;
+		y = _p.y;
+		z = _p.z;
+	}
+	point(double _x, double _y, double _z)
+	{
+		x = _x;
+		y = _y;
+		z = _z;
+	}
+};
+
+class orientation
+{
+public:
+	double x;
+	double y;
+	double z;
+	double w;
+
+	orientation()
+	{
+		x = 0;
+		y = 0;
+		z = 0;
+		w = 1.0;
+	}
+
+	orientation(const orientation & _c)
+	{
+		x = _c.x;
+		y = _c.y;
+		z = _c.z;
+		w = _c.w;
+	}
+
+	orientation(double _x, double _y, double _z, double _w)
+	{
+		x = _x;
+		y = _y;
+		z = _z;
+		w = _w;
+	}
+};
+
+class pose
+{
+public:
+	point pos;
+	orientation ori;
+
+	pose() :
+			pos(), ori()
+	{
+
+	}
+
+	pose(point _pos, orientation _ori) : pos(_pos), ori(_ori)
+	{
+
+	}
 };
 
 class cell
@@ -68,7 +138,6 @@ public:
 	 */
 	generic_map();
 
-
 	/**
 	 *
 	 * @param _resolution
@@ -87,12 +156,12 @@ public:
 
 	void initialize(double _resolution, int _size_x, int _size_y, int _size_z, T _default_value);
 
-	std::vector< std::vector<T> > & operator[](int x)
+	std::vector<std::vector<T> > & operator[](int x)
 	{
 		return map_[x];
 	}
 
-	const std::vector< std::vector<T> > & operator[](int x) const
+	const std::vector<std::vector<T> > & operator[](int x) const
 	{
 		return map_[x];
 	}
@@ -102,7 +171,10 @@ public:
 		return map_.at(x).at(y).at(z);
 	}
 
-	std::vector<std::vector< std::vector<T> > > map_;
+	template<typename cell>
+	bool is_in_bounds(cell c);
+
+	std::vector<std::vector<std::vector<T> > > map_;
 	double resolution;
 	int size_x;
 	int size_y;
@@ -122,15 +194,17 @@ public:
 		size_x = 0;
 		size_y = 0;
 		size_z = 0;
-		base_height = 0;
+		base_height_min = 0;
+		base_height_max = 0;
 	}
 
 	double resolution;
 	int size_x;
 	int size_y;
 	int size_z;
-	int base_height;
-	point origin;
+	double base_height_min;
+	double base_height_max;
+	pose origin;
 
 };
 
@@ -158,7 +232,7 @@ public:
 /**
  *
  */
-class config
+class exploration_map_config
 {
 public:
 	map_config map_config_;
@@ -181,7 +255,7 @@ public:
 	 *
 	 * @param _config
 	 */
-	exploration_map(config _config);
+	exploration_map(exploration_map_config _config);
 
 	/**
 	 *
@@ -193,7 +267,7 @@ public:
 	 * @param _config
 	 * @return
 	 */
-	bool initialize(config _config);
+	bool initialize(exploration_map_config _config);
 
 	/**
 	 *
@@ -208,13 +282,15 @@ public:
 	 */
 	const generic_map<exploration_type> * get_exploration_map();
 
-	const config * get_configuration() const;
+	const exploration_map_config * get_configuration() const;
 
 	cell map_frame(const cell & c);
 
 	bool is_in_bounds(const cell & c);
 
+	static int discretize(double s, double res);
 
+	static double continuous(int d, double res);
 
 private:
 
@@ -224,17 +300,14 @@ private:
 
 	bool update_exploration_map(const cell_list & updated_cells);
 
-
-
-	config config_;
+	exploration_map_config config_;
 	generic_map<exploration_type> exp_map;
 	generic_map<double> occupancy_map;
 	generic_map<int> observation_map;
-	cell origin_cell_;
+//	cell origin_cell_;
 
 };
 
 }
-
 
 #endif /* EXPLORATION_MAP_H_ */

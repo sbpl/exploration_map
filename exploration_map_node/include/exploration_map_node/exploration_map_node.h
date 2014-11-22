@@ -102,8 +102,10 @@ private:
 	int camera_scan_counter;
 	int horizontal_lidar_scan_counter;
 	int vertical_lidar_scan_counter;
-	int base_height_discrete;
+	double base_height_min;
+	double base_height_max;
 	bool publish_debug_messages;
+	double min_sensor_distance_threshold;
 
 	//node handles
 	ros::NodeHandle n;
@@ -127,7 +129,7 @@ private:
 	ros::Publisher camera_update_ray_trace_pub;
 	ros::Publisher exploration_map_pub;
 
-	exploration_map::exploration_map exp_map;
+	exploration::exploration_map exp_map;
 
 };
 

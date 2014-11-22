@@ -6,20 +6,30 @@
   map_size_x: 600
   map_size_y: 300
   map_size_z: 100
-  base_height_disc: 5
+  base_height_min: 0.7
+  base_height_max: 1.7
   unnocupied_prob_threshold: 0.3
   occupancy_prob_threshold: 0.8
   lidar_update_increment: 0.9
   lidar_update_decrement: 0.05
+  min_sensor_distance_threshold: 0.6
   
+  #for segbot
+  #horizontal_lidar_pose_tf_name: /base_laser_link
+  #horizontal_lidar_topic_name: /base_scan
+  #vertical_lidar_pose_tf_name: /tilt_laser_link
+  #vertical_lidar_topic_name: /tilt_scan
+  #camera_pose_tf_name: /base_laser_link
+  #camera_scan_topic_name: /camera_scan_node/camera_scan
   
-  horizontal_lidar_pose_tf_name: /base_laser_link
-  horizontal_lidar_topic_name: /base_scan
-  vertical_lidar_pose_tf_name: /tilt_laser_link
-  vertical_lidar_topic_name: /tilt_scan
-  camera_pose_tf_name: /base_laser_link
+  #for hexarotor
+  horizontal_lidar_pose_tf_name: /fixed_laser_frame
+  horizontal_lidar_topic_name: /fixed_laser
+  vertical_lidar_pose_tf_name: /panning_laser_frame
+  vertical_lidar_topic_name: /panning_laser
+  camera_pose_tf_name: /fixed_laser_frame
   camera_scan_topic_name: /camera_scan_node/camera_scan
   
-  map_publish_rate: 6.0
+  map_publish_rate: 1.0
   number_of_scans_to_skip: 1
-  publish_debug_messages: false
+  publish_debug_messages: true

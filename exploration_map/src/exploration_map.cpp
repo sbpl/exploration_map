@@ -8,7 +8,7 @@
 #include <exploration_map/exploration_map.h>
 #include <exploration_map/exploration_map.hpp>
 
-int discretize(double s, double res)
+int exploration::exploration_map::discretize(double s, double res)
 {
 	double v = s / res;
 	v >= 0 ? v = floor(v) : v = ceil(v - 1);
@@ -16,16 +16,16 @@ int discretize(double s, double res)
 	return d;
 }
 
-exploration_map::exploration_map::exploration_map(config _config)
+exploration::exploration_map::exploration_map(exploration_map_config _config)
 {
 	initialize(_config);
 }
 
-exploration_map::exploration_map::~exploration_map()
+exploration::exploration_map::~exploration_map()
 {
 }
 
-bool exploration_map::exploration_map::update_map(const sensor_update::sensor_update& update)
+bool exploration::exploration_map::update_map(const sensor_update::sensor_update& update)
 {
 	//apply update procedure depending on update type
 	cell_list updated_cells;
@@ -53,17 +53,17 @@ bool exploration_map::exploration_map::update_map(const sensor_update::sensor_up
 	return update_exploration_map(updated_cells);
 }
 
-const exploration_map::generic_map<exploration_map::exploration_type>* exploration_map::exploration_map::get_exploration_map()
+const exploration::generic_map<exploration::exploration_type>* exploration::exploration_map::get_exploration_map()
 {
 	return &exp_map;
 }
 
-bool exploration_map::exploration_map::initialize(config _config)
+bool exploration::exploration_map::initialize(exploration_map_config _config)
 {
 	config_ = _config;
-	origin_cell_.X = discretize(config_.map_config_.origin.x, config_.map_config_.resolution);
-	origin_cell_.Y = discretize(config_.map_config_.origin.y, config_.map_config_.resolution);
-	origin_cell_.Z = discretize(config_.map_config_.origin.z, config_.map_config_.resolution);
+//	origin_cell_.X = discretize(config_.map_config_.origin.pos.x, config_.map_config_.resolution);
+//	origin_cell_.Y = discretize(config_.map_config_.origin.pos.y, config_.map_config_.resolution);
+//	origin_cell_.Z = discretize(config_.map_config_.origin.pos.z, config_.map_config_.resolution);
 
 	//initialize maps
 	double resolution = config_.map_config_.resolution;
@@ -77,7 +77,7 @@ bool exploration_map::exploration_map::initialize(config _config)
 	return true;
 }
 
-bool exploration_map::exploration_map::update_occupancy_map(const sensor_update::lidar_update& update, cell_list& updated_cells)
+bool exploration::exploration_map::update_occupancy_map(const sensor_update::lidar_update& update, cell_list& updated_cells)
 {
 	std::vector<sensor_update::discrete_cell> cells;
 	//todo: have this function return cells that line up with frame
@@ -96,7 +96,7 @@ bool exploration_map::exploration_map::update_occupancy_map(const sensor_update:
 		current_cell = map_frame(current_cell);
 
 		//if out of bounds, continue
-		if (!is_in_bounds(current_cell))
+		if (!occupancy_map.is_in_bounds(current_cell))
 		{
 			continue;
 		}
@@ -127,7 +127,7 @@ bool exploration_map::exploration_map::update_occupancy_map(const sensor_update:
 
 }
 
-bool exploration_map::exploration_map::is_in_bounds(const cell& c)
+bool exploration::exploration_map::is_in_bounds(const cell& c)
 {
 	if (c.X < 0 || c.X >= config_.map_config_.size_x)
 	{
@@ -145,16 +145,26 @@ bool exploration_map::exploration_map::is_in_bounds(const cell& c)
 	return true;
 }
 
-exploration_map::cell exploration_map::exploration_map::map_frame(const cell& c)
+exploration::cell exploration::exploration_map::map_frame(const cell& c)
 {
+	point kp;
+	kp.x = static_cast<double>(c.X);
+	kp.y = static_cast<double>(c.Y);
+	kp.z = static_cast<double>(c.Z);
+
+	//transform to map frame
+	kp = generic_transform::transform_position_to_frame(kp,config_.map_config_.origin);
+
+	//set to cell
 	cell k;
-	k.X = c.X - origin_cell_.X;
-	k.Y = c.Y - origin_cell_.Y;
-	k.Z = c.Z - origin_cell_.Z;
+	k.X = static_cast<int>(round(kp.x));
+	k.Y = static_cast<int>(round(kp.y));
+	k.Z = static_cast<int>(round(kp.z));
+
 	return k;
 }
 
-bool exploration_map::exploration_map::update_exploration_map(const cell_list& updated_cells)
+bool exploration::exploration_map::update_exploration_map(const cell_list& updated_cells)
 {
 	//for each updated cell
 	for (auto a : updated_cells.list)
@@ -182,6 +192,10 @@ bool exploration_map::exploration_map::update_exploration_map(const cell_list& u
 
 		//update value
 		exp_map[a.X][a.Y][a.Z] = exploration_type::unknown;
+		if (unoccupied)
+		{
+			exp_map[a.X][a.Y][a.Z] = exploration_type::unoccupied;
+		}
 		if (explored)
 		{
 			exp_map[a.X][a.Y][a.Z] = exploration_type::explored;
@@ -190,27 +204,23 @@ bool exploration_map::exploration_map::update_exploration_map(const cell_list& u
 		{
 			exp_map[a.X][a.Y][a.Z] = exploration_type::occupied;
 		}
-		if (unoccupied)
-		{
-			exp_map[a.X][a.Y][a.Z] = exploration_type::unoccupied;
-		}
+
 	}
 	return true;
 }
 
-exploration_map::exploration_map::exploration_map()
+exploration::exploration_map::exploration_map()
 {
 }
 
-const exploration_map::config* exploration_map::exploration_map::get_configuration() const
+const exploration::exploration_map_config* exploration::exploration_map::get_configuration() const
 {
 	return &config_;
 }
 
-bool exploration_map::exploration_map::update_observation_map(const sensor_update::camera_update& update, cell_list& updated_cells)
+bool exploration::exploration_map::update_observation_map(const sensor_update::camera_update& update, cell_list& updated_cells)
 {
 	std::vector<sensor_update::discrete_cell> cells;
-	//todo: have this function return cells that line up with frame
 	update.get_discrete_ray_trace_cells(config_.map_config_.resolution, cells);
 
 	bool skip_through_points = false;
@@ -223,7 +233,6 @@ bool exploration_map::exploration_map::update_observation_map(const sensor_updat
 	root_cell = map_frame(root_cell);
 
 	//assuming base level is the only level that matters for determining traversability
-	int base_level = config_.map_config_.base_height;
 
 	for (auto a : cells)
 	{
@@ -238,7 +247,7 @@ bool exploration_map::exploration_map::update_observation_map(const sensor_updat
 		current_cell = map_frame(current_cell);
 
 		//if out of bounds, continue
-		if (!is_in_bounds(current_cell))
+		if (!observation_map.is_in_bounds(current_cell))
 		{
 			continue;
 		}
@@ -261,15 +270,21 @@ bool exploration_map::exploration_map::update_observation_map(const sensor_updat
 			continue;
 		}
 
+		bool occ = false;
+		bool unk = false;
 		//Start skipping points if current point goes over impassable terrain
-		if (exp_map[current_cell.X][current_cell.Y][base_level] == exploration_type::occupied)
+		if (exp_map[current_cell.X][current_cell.Y][current_cell.Z] == exploration_type::occupied)
 		{
-			skip_through_points = true;
-			continue;
+			occ = true;
 		}
 
 		//Start skipping points if current point goes over unknown terrain
-		if( exp_map[current_cell.X][current_cell.Y][base_level] == exploration_type::unknown)
+		if (exp_map[current_cell.X][current_cell.Y][current_cell.Z] == exploration_type::unknown)
+		{
+			unk = true;
+		}
+
+		if ((occ || unk))
 		{
 			skip_through_points = true;
 			continue;
@@ -287,4 +302,10 @@ bool exploration_map::exploration_map::update_observation_map(const sensor_updat
 	}
 	return true;
 
+}
+
+double exploration::exploration_map::continuous(int d, double res)
+{
+	double s = (static_cast<double>(d) * res) + (res/2.0);
+	return s;
 }

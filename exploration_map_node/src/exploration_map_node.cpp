@@ -44,13 +44,16 @@ void exploration_map_node::ros_configure()
 	pn.getParam("camera_scan_topic_name", camera_scan_topic_name);
 	pn.getParam("map_publish_rate", map_publish_rate);
 	pn.getParam("number_of_scans_to_skip", number_of_scans_to_skip);
-	pn.getParam("base_height_disc", base_height_discrete);
+	pn.getParam("base_height_min", base_height_min);
+	pn.getParam("base_height_max", base_height_max);
 	pn.getParam("unnocupied_prob_threshold", unnocupied_prob_thresh);
 	pn.getParam("publish_debug_messages", publish_debug_messages);
+	pn.getParam("min_sensor_distance_threshold", min_sensor_distance_threshold);
 
 	ROS_INFO("subscribed to %s and %s\n", horizontal_lidar_pose_tf_name.c_str(), horizontal_lidar_topic_name.c_str());
 	ROS_INFO("subscribed to %s and %s\n", camera_pose_tf_name.c_str(), camera_scan_topic_name.c_str());
 	ROS_INFO("subscribed to %s and %s\n", vertical_lidar_pose_tf_name.c_str(), vertical_lidar_topic_name.c_str());
+	ROS_INFO("min distance threshold for sensors %f\n", min_sensor_distance_threshold);
 	ROS_INFO("publish debugging messages (%d) \n", publish_debug_messages);
 
 	//subscribe
@@ -133,7 +136,7 @@ void exploration_map_node::convert_pose_to_sensor_update_pose(const geometry_msg
 
 void exploration_map_node::convert_laser_scan_to_sensor_update_ray(const sensor_msgs::LaserScan & scan, sensor_update::sensor_reading & reading)
 {
-	float range_min = scan.range_min;
+	float range_min = min_sensor_distance_threshold;
 	float range_max = scan.range_max;
 	float angle_min = scan.angle_min;
 	float angle_increment = scan.angle_increment;
@@ -239,17 +242,18 @@ bool exploration_map_node::get_lateset_pose_from_tf(geometry_msgs::PoseStamped& 
 
 bool exploration_map_node::initialize_exploration_map()
 {
-	exploration_map::config con;
+	exploration::exploration_map_config con;
 
 	// map related config
 	con.map_config_.resolution = map_resolution;
-	con.map_config_.origin.x = map_origin.x;
-	con.map_config_.origin.y = map_origin.y;
-	con.map_config_.origin.z = map_origin.z;
+	con.map_config_.origin.pos.x = map_origin.x;
+	con.map_config_.origin.pos.y = map_origin.y;
+	con.map_config_.origin.pos.z = map_origin.z;
 	con.map_config_.size_x = map_size_x;
 	con.map_config_.size_y = map_size_y;
 	con.map_config_.size_z = map_size_z;
-	con.map_config_.base_height = base_height_discrete;
+	con.map_config_.base_height_min = base_height_min;
+	con.map_config_.base_height_max = base_height_max;
 
 	//occupancy related config
 	con.occ_map_config_.occ_threshold = occupancy_prob_thresh;
@@ -420,14 +424,14 @@ void exploration_map_node::publish_exploration_map()
 				p.y = y * res + res / 2 + origin_y;
 				p.z = z * res + res / 2 + origin_z;
 
-				exploration_map::exploration_type val = map->at(x, y, z);
+				exploration::exploration_type val = map->at(x, y, z);
 
 				switch (val)
 				{
-				case exploration_map::exploration_type::occupied:
+				case exploration::exploration_type::occupied:
 					p.intensity = 100;
 					break;
-				case exploration_map::exploration_type::explored:
+				case exploration::exploration_type::explored:
 					p.intensity = 50;
 					break;
 				default:
