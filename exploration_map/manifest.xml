@@ -10,6 +10,7 @@
   <url>http://ros.org/wiki/exploration_map</url>
 
   <depend package="sensor_update"/>
+  <depend package="generic_transform"/>
 
    <export>
    <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lexploration_map"/>
