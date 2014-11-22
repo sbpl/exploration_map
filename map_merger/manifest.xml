@@ -18,6 +18,11 @@
   <depend package="generic_transform"/>
   <depend package="pcl_ros"/>
   <depend package="tf"/>
+  
+ <export>
+   <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lmap_merger"/>
+ </export>
+  
 
 </package>
 

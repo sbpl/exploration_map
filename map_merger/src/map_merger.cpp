@@ -27,7 +27,6 @@ void exploration::map_merger::initialize(map_merge_config _config)
 	config_ = _config;
 	int map_num = config_.number_of_maps;
 	double resolution = config_.map_config_.resolution;
-	point origin = config_.map_config_.origin;
 	int size_x = config_.map_config_.size_x;
 	int size_y = config_.map_config_.size_y;
 	int size_z = config_.map_config_.size_z;
@@ -83,13 +82,16 @@ int exploration::map_merger::receive_map_update(const map_update& update)
 	}
 
 	//update master map frame using its transform from child frame
-	update_map(update, pose(), map_origins_[map_id], maps_[map_id]);
+	if(update_master)
+	{
+		update_map(update, pose(), map_origins_[map_id], maps_[map_id]);
+	}
 
 	return 1;
 
 }
 
-int exploration::map_merger::get_map(int map_id, const generic_map<exploration_type>* map)
+int exploration::map_merger::get_map(int map_id, const generic_map<exploration_type>*& map)
 {
 	if (map_id >= config_.number_of_maps)
 	{
@@ -101,7 +103,7 @@ int exploration::map_merger::get_map(int map_id, const generic_map<exploration_t
 	return 1;
 }
 
-int exploration::map_merger::get_master_map(const generic_map<exploration_type>* map)
+int exploration::map_merger::get_master_map(const generic_map<exploration_type>*& map)
 {
 	map = &master_map_;
 	return 1;
@@ -154,8 +156,6 @@ void exploration::map_merger::generate_initial_transforms()
 	double m_res = config_.scan_match_config_.metric_res;
 	double a_res = config_.scan_match_config_.angular_res;
 
-	//set origin map (first map)
-	const auto & origin_map = maps_[0];
 
 	//get base scans for all maps besides first
 	std::vector<std::vector<point_valued<exploration_type> > > map_scans;
@@ -216,7 +216,7 @@ void exploration::map_merger::generate_initial_transforms()
 						double xc = static_cast<double>(dx) * m_res;
 						double yc = static_cast<double>(dy) * m_res;
 						double zc = static_cast<double>(dz) * m_res;
-						double yawc = static_cast<double>(dyaw) * m_res;
+						double yawc = static_cast<double>(dyaw) * a_res;
 						pose trans;
 						trans.pos.x = xc;
 						trans.pos.y = yc;
@@ -224,7 +224,7 @@ void exploration::map_merger::generate_initial_transforms()
 						double quat[4];
 						generic_transform::convert_eular_to_quaterion(0, 0, yawc, quat);
 						generic_transform::convert_quaternion_to_orientation(quat, trans.ori);
-						for (auto auto & p : current_scan)
+						for ( auto & p : current_scan)
 						{
 							p = generic_transform::transform_position_to_frame(p, trans);
 						}
@@ -234,10 +234,11 @@ void exploration::map_merger::generate_initial_transforms()
 						cell_list.reserve(current_scan.size());
 						for (auto & p : current_scan)
 						{
-							cell c;
+							cell_valued<exploration_type> c;
 							c.X = exploration_map::discretize(p.x, config_.map_config_.resolution);
 							c.Y = exploration_map::discretize(p.y, config_.map_config_.resolution);
 							c.Z = exploration_map::discretize(p.z, config_.map_config_.resolution);
+							c.value = p.value;
 							cell_list.push_back(c);
 						}
 

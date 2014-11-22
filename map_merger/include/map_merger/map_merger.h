@@ -84,9 +84,9 @@ public:
 
 	int receive_map_update(const map_update & update);
 
-	int get_map(int map_id, const generic_map<exploration_type> *map );
+	int get_map(int map_id, const generic_map<exploration_type>*& map );
 
-	int get_master_map( const generic_map<exploration_type> *map);
+	int get_master_map( const generic_map<exploration_type>*& map);
 
 private:
 
