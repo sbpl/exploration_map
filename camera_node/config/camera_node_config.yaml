@@ -1,5 +1,10 @@
   frame: /map
-  image_topic_name: /usb_cam/image_raw
+  #for segway
+  #image_topic_name: /usb_cam/image_raw
+  
+  #for hexarotor
+  image_topic_name: /webcam/image_raw
+  
   sensor_field_of_view: 0.523
   senor_distance: 3.0
   sensor_angular_res: 0.05
