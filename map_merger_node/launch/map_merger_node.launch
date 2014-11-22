@@ -1,0 +1,10 @@
+<launch>
+
+<node pkg="map_merger_node" type="map_merger_node" respawn="false" name="map_merger_node" output="screen"   >
+
+<rosparam file = "$(find map_merger_node)/config/map_merger_node_config.yaml" command="load"  />
+
+</node>
+
+
+</launch>
