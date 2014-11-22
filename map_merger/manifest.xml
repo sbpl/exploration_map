@@ -1,0 +1,24 @@
+<package>
+  <description brief="map_merger">
+
+     map_merger
+
+  </description>
+  <author>Brian MacAllister</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/map_merger</url>
+  
+  <depend package="std_msgs"/>
+  <depend package="rospy"/>
+  <depend package="roscpp"/>
+  <depend package="geometry_msgs"/>
+  <depend package="sensor_msgs"/>
+  <depend package="exploration_map"/>
+  <depend package="generic_transform"/>
+  <depend package="pcl_ros"/>
+  <depend package="tf"/>
+
+</package>
+
+
