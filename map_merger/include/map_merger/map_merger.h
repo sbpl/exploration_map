@@ -9,6 +9,7 @@
 #include <iostream>
 #include <algorithm>
 #include <exploration_map/exploration_map.h>
+#include <exploration_map/exploration_map.hpp>
 #include <generic_transform/generic_transform.h>
 
 #ifndef MAP_MERGER_H_
@@ -91,7 +92,7 @@ public:
 private:
 
 
-	int update_map(const map_update& update, const pose& origin_frame, const pose& destination_frame,  generic_map <exploration_type> & map);
+	int update_map(const map_update& update, const pose& destination_frame,  generic_map <exploration_type> & map);
 
 	void generate_initial_transforms();
 
@@ -107,17 +108,3 @@ private:
 }
 
 #endif /* MAP_MERGER_H_ */
-
-/*
- *  frame: /map
- map_resolution: 0.05
- map_origin_x: -35.025
- map_origin_y: -12.025
- map_size_x: 1200
- map_size_y: 700
-
- robot_0_map_name: /Segbot/exploration_map_node/exploration_map
- robot_1_map_name: /Hexarotor/exploration_map/exploration_map
-
- map_publish_rate: 1.0
- */
