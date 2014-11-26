@@ -406,9 +406,9 @@ void exploration_map_node::publish_exploration_map()
 	int size_y = con->map_config_.size_y;
 	int size_z = con->map_config_.size_z;
 	double res = con->map_config_.resolution;
-	double origin_x = con->map_config_.origin.x;
-	double origin_y = con->map_config_.origin.y;
-	double origin_z = con->map_config_.origin.z;
+	double origin_x = con->map_config_.origin.pos.x;
+	double origin_y = con->map_config_.origin.pos.y;
+	double origin_z = con->map_config_.origin.pos.z;
 
 	std::vector<pcl::PointXYZI> points;
 	for (int x = 0; x < size_x; x++)
