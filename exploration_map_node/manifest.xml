@@ -15,10 +15,10 @@
   <depend package="geometry_msgs"/>
   <depend package="sensor_msgs"/>
   <depend package="sensor_update"/>
-  <depend package="exploration_map"/>
   <depend package="pcl_ros"/>
   <depend package="tf"/>
   <depend package="camera_node"/>
+  <depend package="exploration_map"/>
 
 </package>
 
