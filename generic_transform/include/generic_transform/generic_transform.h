@@ -15,8 +15,8 @@
 namespace generic_transform
 {
 
-template <typename orientation>
-orientation normalize(orientation ori)
+template<typename orientation>
+inline orientation normalize(orientation ori)
 {
 	double mag = sqrt(ori.x * ori.x + ori.y * ori.y + ori.z * ori.z + ori.w * ori.w);
 	ori.x = ori.x / mag;
@@ -26,7 +26,7 @@ orientation normalize(orientation ori)
 	return ori;
 }
 
-void normalize(double q[4])
+inline void normalize(double q[4])
 {
 	double q_mag = sqrt(q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3]);
 	q[0] /= q_mag;
@@ -36,7 +36,7 @@ void normalize(double q[4])
 	q_mag = sqrt(q[0] * q[0] + q[1] * q[1] + q[2] * q[2] + q[3] * q[3]);
 }
 
-void quaternion_multiply(const double r[4], const double q[4], double f[4])
+inline void quaternion_multiply(const double r[4], const double q[4], double f[4])
 {
 	f[0] = (r[0] * q[0]) - (r[1] * q[1]) - (r[2] * q[2]) - (r[3] * q[3]);
 	f[1] = (r[0] * q[1]) + (r[1] * q[0]) + (r[2] * q[3]) - (r[3] * q[2]);
@@ -44,8 +44,8 @@ void quaternion_multiply(const double r[4], const double q[4], double f[4])
 	f[3] = (r[0] * q[3]) + (r[1] * q[2]) - (r[2] * q[1]) + (r[3] * q[0]);
 }
 
-template <typename orientation>
-orientation rotate_orientation(orientation one, orientation two)
+template<typename orientation>
+inline orientation rotate_orientation(orientation one, orientation two)
 {
 	double r[4] =
 	{ one.w, one.x, one.y, one.z };
@@ -58,7 +58,7 @@ orientation rotate_orientation(orientation one, orientation two)
 	return three;
 }
 
-void quaternion_conjugate(const double r[4], double q[4])
+inline void quaternion_conjugate(const double r[4], double q[4])
 {
 	q[0] = r[0];
 	q[1] = -r[1];
@@ -66,7 +66,7 @@ void quaternion_conjugate(const double r[4], double q[4])
 	q[3] = -r[3];
 }
 
-void quaternion_inverse(const double q[4], double q_inv[4])
+inline void quaternion_inverse(const double q[4], double q_inv[4])
 {
 	double q_con[4];
 	quaternion_conjugate(q, q_con);
@@ -78,7 +78,7 @@ void quaternion_inverse(const double q[4], double q_inv[4])
 }
 
 template<typename position, typename orientation>
-position rotate_position(position pos, orientation ori)
+inline position rotate_position(position pos, orientation ori)
 {
 	double p[4] =
 	{ 0, pos.x, pos.y, pos.z };
@@ -99,7 +99,7 @@ position rotate_position(position pos, orientation ori)
 }
 
 template<typename position, typename pose>
-position transform_position_from_frame(position pos, pose p)
+inline position transform_position_from_frame(position pos, pose p)
 {
 	//rotate
 	pos = rotate_position(pos, p.ori);
@@ -113,7 +113,7 @@ position transform_position_from_frame(position pos, pose p)
 }
 
 template<typename position, typename pose>
-position transform_position_to_frame(position pos, pose p)
+inline position transform_position_to_frame(position pos, pose p)
 {
 	//translate
 	pos.x -= p.pos.x;
@@ -131,7 +131,7 @@ position transform_position_to_frame(position pos, pose p)
 	return pos;
 }
 
-void convert_eular_to_quaterion(double roll, double pitch, double yaw, double q[4])
+inline void convert_eular_to_quaterion(double roll, double pitch, double yaw, double q[4])
 {
 	double eps = 0.00000000001;
 	double q_den = sqrt(cos(pitch) * cos(roll) + cos(pitch) * cos(yaw) + cos(roll) * cos(yaw) + sin(pitch) * sin(roll) * sin(yaw) + 1) + eps;
@@ -143,7 +143,7 @@ void convert_eular_to_quaterion(double roll, double pitch, double yaw, double q[
 }
 
 template<typename orientation>
-void convert_quaternion_to_orientation(double q[4], orientation & orient)
+inline void convert_quaternion_to_orientation(double q[4], orientation & orient)
 {
 	orient.w = q[0];
 	orient.x = q[1];
@@ -152,8 +152,5 @@ void convert_quaternion_to_orientation(double q[4], orientation & orient)
 }
 
 }
-
-
-
 
 #endif /* GENERIC_TRANSFORM_H_ */
