@@ -10,8 +10,14 @@
 
 #include <exploration_map/exploration_map.h>
 
+using namespace exploration;
+
+/*
+ * generic map implementation
+ */
+
 template<typename T>
-inline exploration::generic_map<T>::generic_map()
+generic_map<T>::generic_map()
 {
 	resolution = 0;
 	size_x = 0;
@@ -20,18 +26,18 @@ inline exploration::generic_map<T>::generic_map()
 }
 
 template<typename T>
-inline exploration::generic_map<T>::~generic_map()
+generic_map<T>::~generic_map()
 {
 }
 
 template<typename T>
-inline exploration::generic_map<T>::generic_map(double _resolution, int _size_x, int _size_y, int _size_z)
+generic_map<T>::generic_map(double _resolution, int _size_x, int _size_y, int _size_z)
 {
 	initialize(_resolution, _size_x, _size_y, _size_z);
 }
 
 template<typename T>
-inline void exploration::generic_map<T>::initialize(double _resolution, int _size_x, int _size_y, int _size_z)
+void generic_map<T>::initialize(double _resolution, int _size_x, int _size_y, int _size_z)
 {
 	resolution = _resolution;
 	size_x = _size_x;
@@ -41,7 +47,7 @@ inline void exploration::generic_map<T>::initialize(double _resolution, int _siz
 	for (int i = 0; i < size_x; i++)
 	{
 		map_[i].resize(size_y);
-		for(int j = 0; j < size_y; j++)
+		for (int j = 0; j < size_y; j++)
 		{
 			map_[i][j].resize(size_z);
 		}
@@ -49,7 +55,7 @@ inline void exploration::generic_map<T>::initialize(double _resolution, int _siz
 }
 
 template<typename T>
-inline void exploration::generic_map<T>::initialize(double _resolution, int _size_x, int _size_y, int _size_z, T _default_value)
+void generic_map<T>::initialize(double _resolution, int _size_x, int _size_y, int _size_z, T _default_value)
 {
 	initialize(_resolution, _size_x, _size_y, _size_z);
 	for (int i = 0; i < size_x; i++)
@@ -64,7 +70,7 @@ inline void exploration::generic_map<T>::initialize(double _resolution, int _siz
 	}
 }
 template<typename T> template<typename cell>
-inline bool exploration::generic_map<T>::is_in_bounds(cell c)
+bool generic_map<T>::is_in_bounds(cell c)
 {
 	if (c.X < 0 || c.X >= size_x)
 	{
@@ -82,7 +88,22 @@ inline bool exploration::generic_map<T>::is_in_bounds(cell c)
 	return true;
 }
 
+template<typename T>
+std::vector<std::vector<T> > & generic_map<T>::operator[](int x)
+{
+	return map_[x];
+}
 
+template<typename T>
+const std::vector<std::vector<T> > & generic_map<T>::operator[](int x) const
+{
+	return map_[x];
+}
 
+template<typename T>
+T generic_map<T>::at(int x, int y, int z) const
+{
+	return map_.at(x).at(y).at(z);
+}
 
 #endif /* EXPLORATION_MAP_HPP_ */

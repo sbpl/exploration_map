@@ -8,6 +8,10 @@
 #include <exploration_map/exploration_map.h>
 #include <exploration_map/exploration_map.hpp>
 
+template class generic_map<exploration_type> ;
+template class generic_map<int> ;
+template class generic_map<double> ;
+
 int exploration::exploration_map::discretize(double s, double res)
 {
 	double v = s / res;
@@ -25,10 +29,9 @@ exploration::exploration_map::~exploration_map()
 {
 }
 
-bool exploration::exploration_map::update_map(const sensor_update::sensor_update& update)
+bool exploration::exploration_map::update_map(const sensor_update::sensor_update& update, cell_list & updated_cells)
 {
 	//apply update procedure depending on update type
-	cell_list updated_cells;
 	auto t = update.get_type();
 	switch (t)
 	{
@@ -61,9 +64,10 @@ const exploration::generic_map<exploration::exploration_type>* exploration::expl
 bool exploration::exploration_map::initialize(exploration_map_config _config)
 {
 	config_ = _config;
-//	origin_cell_.X = discretize(config_.map_config_.origin.pos.x, config_.map_config_.resolution);
-//	origin_cell_.Y = discretize(config_.map_config_.origin.pos.y, config_.map_config_.resolution);
-//	origin_cell_.Z = discretize(config_.map_config_.origin.pos.z, config_.map_config_.resolution);
+	disc_origin_ = config_.map_config_.origin;
+	disc_origin_.pos.x = discretize(config_.map_config_.origin.pos.x, config_.map_config_.resolution);
+	disc_origin_.pos.y = discretize(config_.map_config_.origin.pos.y, config_.map_config_.resolution);
+	disc_origin_.pos.z = discretize(config_.map_config_.origin.pos.z, config_.map_config_.resolution);
 
 	//initialize maps
 	double resolution = config_.map_config_.resolution;
@@ -153,7 +157,7 @@ exploration::cell exploration::exploration_map::map_frame(const cell& c)
 	kp.z = static_cast<double>(c.Z);
 
 	//transform to map frame
-	kp = generic_transform::transform_position_to_frame(kp,config_.map_config_.origin);
+	kp = generic_transform::transform_position_to_frame(kp, disc_origin_);
 
 	//set to cell
 	cell k;
@@ -306,6 +310,8 @@ bool exploration::exploration_map::update_observation_map(const sensor_update::c
 
 double exploration::exploration_map::continuous(int d, double res)
 {
-	double s = (static_cast<double>(d) * res) + (res/2.0);
+	double s = (static_cast<double>(d) * res) + (res / 2.0);
 	return s;
 }
+
+

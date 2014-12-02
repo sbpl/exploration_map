@@ -15,6 +15,8 @@
 #include <sensor_update/sensor_update.h>
 #include <generic_transform/generic_transform.h>
 #include <algorithm>
+#include <sstream>
+#include <iomanip>
 
 /**
  *
@@ -30,84 +32,122 @@ enum class exploration_type
 	unknown, explored, occupied, unoccupied
 };
 
+/**
+ * todo
+ */
 class point
 {
 public:
+
+	/**
+	 *
+	 */
+	point();
+
+	/**
+	 *
+	 * @param _p
+	 */
+	point(const point & _p);
+
+	/**
+	 *
+	 * @param _x
+	 * @param _y
+	 * @param _z
+	 */
+	point(double _x, double _y, double _z);
+
+	/**
+	 *
+	 * @return
+	 */
+	std::string to_string() const;
+
+	friend std::ostream& operator<<(std::ostream &out, const point & p);
+
 	double x;
 	double y;
 	double z;
 
-	point()
-	{
-		x = 0;
-		y = 0;
-		z = 0;
-	}
-	point(const point & _p)
-	{
-		x = _p.x;
-		y = _p.y;
-		z = _p.z;
-	}
-	point(double _x, double _y, double _z)
-	{
-		x = _x;
-		y = _y;
-		z = _z;
-	}
 };
 
+/**
+ * todo
+ */
 class orientation
 {
 public:
+
+	/**
+	 *
+	 */
+	orientation();
+
+	/**
+	 *
+	 * @param _c
+	 */
+	orientation(const orientation & _c);
+
+	/**
+	 *
+	 * @param _x
+	 * @param _y
+	 * @param _z
+	 * @param _w
+	 */
+	orientation(double _x, double _y, double _z, double _w);
+
+	/**
+	 *
+	 * @return
+	 */
+	std::string to_string() const;
+
+	friend std::ostream& operator<<(std::ostream &out, const orientation & ori);
+
 	double x;
 	double y;
 	double z;
 	double w;
 
-	orientation()
-	{
-		x = 0;
-		y = 0;
-		z = 0;
-		w = 1.0;
-	}
-
-	orientation(const orientation & _c)
-	{
-		x = _c.x;
-		y = _c.y;
-		z = _c.z;
-		w = _c.w;
-	}
-
-	orientation(double _x, double _y, double _z, double _w)
-	{
-		x = _x;
-		y = _y;
-		z = _z;
-		w = _w;
-	}
 };
 
+/**
+ * todo
+ */
 class pose
 {
 public:
+
+	/**
+	 *
+	 */
+	pose();
+
+	/**
+	 *
+	 * @param _pos
+	 * @param _ori
+	 */
+	pose(point _pos, orientation _ori);
+
+	/**
+	 *
+	 * @return
+	 */
+	std::string to_string() const;
+
+	friend std::ostream& operator<<(std::ostream &out, const pose & p);
+
 	point pos;
 	orientation ori;
-
-	pose() :
-			pos(), ori()
-	{
-
-	}
-
-	pose(point _pos, orientation _ori) : pos(_pos), ori(_ori)
-	{
-
-	}
 };
 
+/**
+ * todo
+ */
 class cell
 {
 public:
@@ -116,18 +156,26 @@ public:
 	int Z;
 };
 
+/**
+ * todo
+ */
 class cell_list
 {
 public:
 
-	void push_back(cell c)
-	{
-		list.push_back(c);
-	}
+	/**
+	 *
+	 */
+	void push_back(cell c);
+
+	size_t size();
 
 	std::vector<cell> list;
 };
 
+/**
+ * todo
+ */
 template<typename T>
 class generic_map
 {
@@ -156,20 +204,11 @@ public:
 
 	void initialize(double _resolution, int _size_x, int _size_y, int _size_z, T _default_value);
 
-	std::vector<std::vector<T> > & operator[](int x)
-	{
-		return map_[x];
-	}
+	std::vector<std::vector<T> > & operator[](int x);
 
-	const std::vector<std::vector<T> > & operator[](int x) const
-	{
-		return map_[x];
-	}
+	const std::vector<std::vector<T> > & operator[](int x) const;
 
-	T at(int x, int y, int z) const
-	{
-		return map_.at(x).at(y).at(z);
-	}
+	T at(int x, int y, int z) const;
 
 	template<typename cell>
 	bool is_in_bounds(cell c);
@@ -181,9 +220,8 @@ public:
 	int size_z;
 };
 
-
 /**
- *
+ * todo
  */
 class map_config
 {
@@ -210,7 +248,7 @@ public:
 };
 
 /**
- *
+ * todo
  */
 class occupancy_map_config
 {
@@ -231,7 +269,7 @@ public:
 };
 
 /**
- *
+ * todo
  */
 class exploration_map_config
 {
@@ -241,7 +279,7 @@ public:
 };
 
 /**
- *
+ * todo
  */
 class exploration_map
 {
@@ -275,7 +313,7 @@ public:
 	 * @param update
 	 * @return
 	 */
-	bool update_map(const sensor_update::sensor_update & update);
+	bool update_map(const sensor_update::sensor_update & update, cell_list & updated_cells);
 
 	/**
 	 *
@@ -302,10 +340,10 @@ private:
 	bool update_exploration_map(const cell_list & updated_cells);
 
 	exploration_map_config config_;
+	pose disc_origin_;
 	generic_map<exploration_type> exp_map;
 	generic_map<double> occupancy_map;
 	generic_map<int> observation_map;
-//	cell origin_cell_;
 
 };
 
