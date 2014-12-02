@@ -80,6 +80,12 @@ private:
 
 	void publish_exploration_map();
 
+	void publish_exploration_map_update();
+
+	void update_robot_pose();
+
+	void publish_robot_pose();
+
 	double map_resolution;
 	geometry_msgs::Point map_origin;
 	int map_size_x;
@@ -89,6 +95,7 @@ private:
 	std::string horizontal_lidar_pose_tf_name;
 	std::string vertical_lidar_pose_tf_name;
 	std::string camera_pose_tf_name;
+	std::string robot_pose_tf_name;
 	std::string horizontal_lidar_topic_name;
 	std::string vertical_lidar_topic_name;
 	std::string camera_scan_topic_name;
@@ -128,8 +135,12 @@ private:
 	ros::Publisher camera_update_pub;
 	ros::Publisher camera_update_ray_trace_pub;
 	ros::Publisher exploration_map_pub;
+	ros::Publisher exploration_map_update_pub;
+	ros::Publisher robot_pose_pub;
 
 	exploration::exploration_map exp_map;
+	exploration::cell_list updated_cell_list;
+	geometry_msgs::PoseStamped current_robot_pose;
 
 };
 

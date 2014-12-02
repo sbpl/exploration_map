@@ -15,20 +15,21 @@
   min_sensor_distance_threshold: 0.6
   
   #for segbot
-  #horizontal_lidar_pose_tf_name: /base_laser_link
-  #horizontal_lidar_topic_name: /base_scan
-  #vertical_lidar_pose_tf_name: /tilt_laser_link
-  #vertical_lidar_topic_name: /tilt_scan
-  #camera_pose_tf_name: /base_laser_link
-  #camera_scan_topic_name: /camera_scan_node/camera_scan
+  horizontal_lidar_pose_tf_name: /base_laser_link
+  horizontal_lidar_topic_name: /base_scan
+  vertical_lidar_pose_tf_name: /tilt_laser_link
+  vertical_lidar_topic_name: /tilt_scan
+  camera_pose_tf_name: /base_laser_link
+  camera_scan_topic_name: /camera_scan_node/camera_scan
+  robot_pose_tf_name: /base_footprint
   
   #for hexarotor
-  horizontal_lidar_pose_tf_name: /fixed_laser_frame
-  horizontal_lidar_topic_name: /fixed_laser
-  vertical_lidar_pose_tf_name: /panning_laser_frame
-  vertical_lidar_topic_name: /panning_laser
-  camera_pose_tf_name: /fixed_laser_frame
-  camera_scan_topic_name: /camera_scan_node/camera_scan
+  #horizontal_lidar_pose_tf_name: /fixed_laser_frame
+  #horizontal_lidar_topic_name: /fixed_laser
+  #vertical_lidar_pose_tf_name: /panning_laser_frame
+  #vertical_lidar_topic_name: /panning_laser
+  #camera_pose_tf_name: /fixed_laser_frame
+  #camera_scan_topic_name: /camera_scan_node/camera_scan
   
   map_publish_rate: 1.0
   number_of_scans_to_skip: 1

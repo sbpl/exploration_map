@@ -35,6 +35,7 @@ void exploration_map_node::ros_configure()
 	pn.getParam("horizontal_lidar_pose_tf_name", horizontal_lidar_pose_tf_name);
 	pn.getParam("vertical_lidar_pose_tf_name", vertical_lidar_pose_tf_name);
 	pn.getParam("camera_pose_tf_name", camera_pose_tf_name);
+	pn.getParam("robot_pose_tf_name", robot_pose_tf_name);
 	pn.getParam("horizontal_lidar_topic_name", horizontal_lidar_topic_name);
 	pn.getParam("vertical_lidar_topic_name", vertical_lidar_topic_name);
 	pn.getParam("camera_scan_topic_name", camera_scan_topic_name);
@@ -72,6 +73,8 @@ void exploration_map_node::ros_configure()
 	camera_update_pub = pn.advertise<pcl::PointCloud<pcl::PointXYZI> >("camera_update", 1);
 	camera_update_ray_trace_pub = pn.advertise<pcl::PointCloud<pcl::PointXYZI> >("camera_update_ray_trace", 1);
 	exploration_map_pub = pn.advertise<pcl::PointCloud<pcl::PointXYZI> >("exploration_map", 1);
+	exploration_map_update_pub = pn.advertise<pcl::PointCloud<pcl::PointXYZI> >("exploration_map_update", 1);
+	robot_pose_pub = pn.advertise<geometry_msgs::PoseStamped>("robot_pose", 1);
 }
 
 void exploration_map_node::horizontal_lidar_callback(const sensor_msgs::LaserScanConstPtr& msg)
@@ -110,6 +113,9 @@ void exploration_map_node::horizontal_lidar_callback(const sensor_msgs::LaserSca
 		// publish transformed cells
 		publish_sensor_update_ray_trace(update, horizontal_lidar_update_ray_trace_pub);
 	}
+
+	//update_robot_pose
+	update_robot_pose();
 
 	//update exploration map
 	update_exploration_map(update);
@@ -213,7 +219,7 @@ bool exploration_map_node::get_lateset_pose_from_tf(geometry_msgs::PoseStamped& 
 {
 	auto input_pose = pose;
 	input_pose.header.frame_id = pose_name;
-	input_pose.header.stamp = ros::Time(0);
+	input_pose.header.stamp = ros::Time::now();
 	input_pose.pose.position.x = 0;
 	input_pose.pose.position.y = 0;
 	input_pose.pose.position.z = 0;
@@ -268,7 +274,7 @@ bool exploration_map_node::initialize_exploration_map()
 
 bool exploration_map_node::update_exploration_map(const sensor_update::sensor_update& update)
 {
-	exp_map.update_map(update);
+	exp_map.update_map(update, updated_cell_list);
 	return true;
 }
 
@@ -285,9 +291,9 @@ void exploration_map_node::camera_scan_callback(const camera_node::camera_scanCo
 		camera_scan_counter = 0;
 	}
 
-	//get pose
-	geometry_msgs::PoseStamped pose;
-	if (!get_lateset_pose_from_tf(pose, camera_pose_tf_name))
+	//get camera pose
+	geometry_msgs::PoseStamped camera_pose;
+	if (!get_lateset_pose_from_tf(camera_pose, camera_pose_tf_name))
 	{
 		ROS_ERROR("could not retrieve pose for camera scan");
 		return;
@@ -296,7 +302,7 @@ void exploration_map_node::camera_scan_callback(const camera_node::camera_scanCo
 	//create camera update
 	sensor_update::pose sense_pose;
 	sensor_update::sensor_reading reading;
-	convert_pose_to_sensor_update_pose(pose, sense_pose);
+	convert_pose_to_sensor_update_pose(camera_pose, sense_pose);
 	camera_node::camera_scan scan = *msg;
 	convert_camera_scan_to_sensor_update_ray(scan, reading);
 	sensor_update::camera_update update(sense_pose, reading);
@@ -309,6 +315,9 @@ void exploration_map_node::camera_scan_callback(const camera_node::camera_scanCo
 		// publish transformed cells
 		publish_sensor_update_ray_trace(update, camera_update_ray_trace_pub);
 	}
+
+	//update_robot_pose
+	update_robot_pose();
 
 	//update exploration map
 	update_exploration_map(update);
@@ -355,6 +364,14 @@ void exploration_map_node::convert_camera_scan_to_sensor_update_ray(const camera
 void exploration_map_node::map_publish_timer_callback(const ros::TimerEvent& event)
 {
 	publish_exploration_map();
+
+	publish_exploration_map_update();
+
+	//clear updated cell list
+	updated_cell_list.list.clear();
+
+	publish_robot_pose();
+
 }
 
 void exploration_map_node::vertical_lidar_callback(const sensor_msgs::LaserScanConstPtr& msg)
@@ -394,6 +411,9 @@ void exploration_map_node::vertical_lidar_callback(const sensor_msgs::LaserScanC
 		publish_sensor_update_ray_trace(update, vertical_lidar_update_ray_trace_pub);
 	}
 
+	//update_robot_pose
+	update_robot_pose();
+
 	//update exploration map
 	update_exploration_map(update);
 }
@@ -411,6 +431,7 @@ void exploration_map_node::publish_exploration_map()
 	double origin_z = con->map_config_.origin.pos.z;
 
 	std::vector<pcl::PointXYZI> points;
+	points.reserve(size_x*size_y*size_z);
 	for (int x = 0; x < size_x; x++)
 	{
 		for (int y = 0; y < size_y; y++)
@@ -420,9 +441,9 @@ void exploration_map_node::publish_exploration_map()
 			{
 
 				pcl::PointXYZI p;
-				p.x = x * res + res / 2 + origin_x;
-				p.y = y * res + res / 2 + origin_y;
-				p.z = z * res + res / 2 + origin_z;
+				p.x = exploration::exploration_map::continuous(x,res) + origin_x;
+				p.y = exploration::exploration_map::continuous(y,res) + origin_y;
+				p.z = exploration::exploration_map::continuous(z,res) + origin_z;
 
 				exploration::exploration_type val = map->at(x, y, z);
 
@@ -446,3 +467,57 @@ void exploration_map_node::publish_exploration_map()
 	publish_point_cloud(points, exploration_map_pub);
 }
 
+void exploration_map_node::publish_exploration_map_update()
+{
+	auto map = exp_map.get_exploration_map();
+	auto con = exp_map.get_configuration();
+	double res = con->map_config_.resolution;
+	double origin_x = con->map_config_.origin.pos.x;
+	double origin_y = con->map_config_.origin.pos.y;
+	double origin_z = con->map_config_.origin.pos.z;
+
+	std::vector<pcl::PointXYZI> points;
+	points.reserve(updated_cell_list.size());
+
+	for(auto c : updated_cell_list.list)
+	{
+		pcl::PointXYZI p;
+		p.x = exploration::exploration_map::continuous(c.X,res) + origin_x;
+		p.y = exploration::exploration_map::continuous(c.Y,res) + origin_y;
+		p.z = exploration::exploration_map::continuous(c.Z,res) + origin_z;
+
+		exploration::exploration_type val = map->at(c.X,c.Y,c.Z);
+
+		switch (val)
+		{
+		case exploration::exploration_type::occupied:
+			p.intensity = 100;
+			break;
+		case exploration::exploration_type::explored:
+			p.intensity = 50;
+			break;
+		case exploration::exploration_type::unoccupied:
+			p.intensity = 0;
+			break;
+		default:
+			continue;
+			break;
+		}
+		points.push_back(p);
+	}
+	publish_point_cloud(points, exploration_map_update_pub);
+
+}
+
+void exploration_map_node::update_robot_pose()
+{
+	if(!get_lateset_pose_from_tf(current_robot_pose, robot_pose_tf_name ))
+	{
+		ROS_ERROR("could not get current robot pose");
+	}
+}
+
+void exploration_map_node::publish_robot_pose()
+{
+	robot_pose_pub.publish(current_robot_pose);
+}
