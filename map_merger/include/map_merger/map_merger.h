@@ -83,16 +83,18 @@ public:
 
 	void initialize(map_merge_config _config);
 
-	int receive_map_update(const map_update & update);
+	int receive_map_update(const map_update & update, cell_list & updated_cells);
 
 	int get_map(int map_id, const generic_map<exploration_type>*& map );
+
+	int get_origin(int map_id, const pose *& origin);
 
 	int get_master_map( const generic_map<exploration_type>*& map);
 
 private:
 
 
-	int update_map(const map_update& update, const pose& destination_frame,  generic_map <exploration_type> & map);
+	int update_map(const map_update& update, const pose& destination_frame,  generic_map <exploration_type> & map, cell_list * upated_cells);
 
 	void generate_initial_transforms();
 

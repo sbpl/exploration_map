@@ -41,12 +41,10 @@ void exploration::map_merger::initialize(map_merge_config _config)
 		maps_.push_back(std::move(m)); //move constructor
 
 		pose empty_pose;
-		printf("%f %f %f , %f %f %f %f\n", empty_pose.pos.x,empty_pose.pos.y,empty_pose.pos.z,empty_pose.ori.x,empty_pose.ori.y,empty_pose.ori.z,empty_pose.ori.w);
+		printf("%f %f %f , %f %f %f %f\n", empty_pose.pos.x, empty_pose.pos.y, empty_pose.pos.z, empty_pose.ori.x, empty_pose.ori.y, empty_pose.ori.z,
+				empty_pose.ori.w);
 		map_origins_.push_back(empty_pose);
 	}
-
-	std::string blah;
-	std::cin >> blah;
 
 	//initialize map counters
 	for (int i = 0; i < map_num; i++)
@@ -58,7 +56,7 @@ void exploration::map_merger::initialize(map_merge_config _config)
 	master_map_.initialize(resolution, size_x, size_y, size_z);
 }
 
-int exploration::map_merger::receive_map_update(const map_update& update)
+int exploration::map_merger::receive_map_update(const map_update& update, cell_list & updated_cells)
 {
 	int map_id = update.map_id;
 	if (map_id >= config_.number_of_maps)
@@ -68,7 +66,7 @@ int exploration::map_merger::receive_map_update(const map_update& update)
 
 	//update specified map: no transform required
 	printf("update map %d\n", update.map_id);
-	update_map(update, pose(), maps_[map_id]);
+	update_map(update, pose(), maps_[map_id], NULL);
 
 	//increment counter
 	map_counter_[map_id]++;
@@ -78,7 +76,7 @@ int exploration::map_merger::receive_map_update(const map_update& update)
 	for (auto c : map_counter_)
 	{
 		//printf("map counter value %d\n", c);
-		if (c < 1)
+		if (c < 10)
 		{
 			update_master = false;
 			break;
@@ -86,12 +84,12 @@ int exploration::map_merger::receive_map_update(const map_update& update)
 	}
 
 	printf("size of map origins is %d\n", (int) map_origins_.size());
-	for(auto empty_pose : map_origins_)
+	for (auto empty_pose : map_origins_)
 	{
 		//empty_pose
-		printf("%f %f %f , %f %f %f %f\n", empty_pose.pos.x,empty_pose.pos.y,empty_pose.pos.z,empty_pose.ori.x,empty_pose.ori.y,empty_pose.ori.z,empty_pose.ori.w);
+		printf("%f %f %f , %f %f %f %f\n", empty_pose.pos.x, empty_pose.pos.y, empty_pose.pos.z, empty_pose.ori.x, empty_pose.ori.y, empty_pose.ori.z,
+				empty_pose.ori.w);
 	}
-
 
 	if (update_master)
 	{
@@ -103,8 +101,8 @@ int exploration::map_merger::receive_map_update(const map_update& update)
 		}
 
 		//update master map frame using its transform from child frame
-		printf("update master map with map id %d\n",(int) map_id);
-		update_map(update, map_origins_[map_id], master_map_);
+		printf("update master map with map id %d\n", (int) map_id);
+		update_map(update, map_origins_[map_id], master_map_, &updated_cells);
 	}
 
 	return 1;
@@ -129,21 +127,17 @@ int exploration::map_merger::get_master_map(const generic_map<exploration_type>*
 	return 1;
 }
 
-int exploration::map_merger::update_map(const map_update& update, const pose& destination_frame,
-		generic_map<exploration_type>& map)
+int exploration::map_merger::update_map(const map_update& update, const pose& destination_frame, generic_map<exploration_type>& map,
+		cell_list * updated_cells)
 {
 	double res = config_.map_config_.resolution;
 	auto destination = destination_frame;
 	int update_count = 0;
-	int obs_count = 0;
 
 	printf("update map using pos %f %f %f\n", destination_frame.pos.x, destination_frame.pos.y, destination_frame.pos.z);
 
 	for (auto p : update.points)
 	{
-		//transform from point to global frame
-		//p = generic_transform::transform_position_from_frame(p, origin);
-
 		//transform point to local frame
 		p = generic_transform::transform_position_to_frame(p, config_.map_config_.origin);
 
@@ -164,15 +158,17 @@ int exploration::map_merger::update_map(const map_update& update, const pose& de
 		}
 
 		//set cell value
+		auto prev_val = map[current_cell.X][current_cell.Y][current_cell.Z];
 		map[current_cell.X][current_cell.Y][current_cell.Z] = val;
 
-		if (val == exploration::exploration_type::occupied)
+		if(prev_val != map[current_cell.X][current_cell.Y][current_cell.Z])
 		{
-			obs_count++;
-			//printf("cell %d %d %d occ\n", current_cell.X, current_cell.Y, current_cell.Z);
+			update_count++;
+			if(updated_cells != NULL)
+			{
+				updated_cells->push_back(current_cell);
+			}
 		}
-
-		update_count++;
 
 	}
 	//printf("number of obstacles is %d\n", obs_count);
@@ -345,7 +341,16 @@ void exploration::map_merger::generate_initial_transforms()
 		printf("map_origins %d is %f %f %f\n", (int) i, map_origins_[i].pos.x, map_origins_[i].pos.y, map_origins_[i].pos.z);
 	}
 
-//	std::string blah;
-//	std::cin >> blah;
 }
 
+int exploration::map_merger::get_origin(int map_id, const pose*& origin)
+{
+	if (map_id >= config_.number_of_maps)
+	{
+		return 0;
+	}
+
+	origin = &map_origins_[map_id];
+
+	return 1;
+}
