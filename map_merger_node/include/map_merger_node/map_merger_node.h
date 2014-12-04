@@ -21,6 +21,7 @@
 #include <tf/transform_listener.h>
 #include <algorithm>
 #include <map_merger/map_merger.h>
+#include <tf/transform_listener.h>
 
 class map_merger_node
 {
@@ -40,11 +41,21 @@ private:
 
 	void robot_1_map_callback(const pcl::PointCloud<pcl::PointXYZI>::ConstPtr & msg);
 
+	void robot_0_pose_callback(const geometry_msgs::PoseStamped::ConstPtr & msg);
+
+	void robot_1_pose_callback(const geometry_msgs::PoseStamped::ConstPtr & msg);
+
 	void map_publish_callback(const ros::TimerEvent & event);
 
 	void publish_point_cloud(const std::vector<pcl::PointXYZI> & points, const ros::Publisher & pub);
 
+	void publish_pose(const geometry_msgs::PoseStamped & pose, const ros::Publisher & pub);
+
+	void publish_inner_maps();
+
 	void publish_master_map();
+
+	void publish_map_update();
 
 	void initialize_map_merger();
 
@@ -52,9 +63,13 @@ private:
 
 	void get_point_cloud_from_map(const exploration::generic_map<exploration::exploration_type> * map, std::vector<pcl::PointXYZI> & points);
 
+	void get_point_cloud_from_map_update(const exploration::cell_list & cells, std::vector<pcl::PointXYZI> & points);
+
+	void transform_pose_stamped_with_origin(geometry_msgs::PoseStamped & pose, const exploration::pose * origin);
+
 	//config variables
 	std::string frame_name;
-	double map_resoultion;
+	double map_resolution;
 	double map_origin_x;
 	double map_origin_y;
 	double map_origin_z;
@@ -65,6 +80,8 @@ private:
 	double map_publish_rate;
 	std::string robot_0_map_name;
 	std::string robot_1_map_name;
+	std::string robot_0_pose_name;
+	std::string robot_1_pose_name;
 	double scan_match_angular_res;
 	double scan_match_metric_res;
 	int scan_match_dx;
@@ -82,17 +99,22 @@ private:
 	//ros subscribers
 	ros::Subscriber robot_0_map_subscriber;
 	ros::Subscriber robot_1_map_subscriber;
+	ros::Subscriber robot_0_pose_subscriber;
+	ros::Subscriber robot_1_pose_subscriber;
 
 	//ros publishers
 	ros::Publisher map_publisher;
+	ros::Publisher map_update_publisher;
 	ros::Publisher map_0_publisher;
 	ros::Publisher map_1_publisher;
+	ros::Publisher robot_1_pose_publisher;
+	ros::Publisher robot_0_pose_publisher;
 
 	//variables
 	pcl::PointCloud<pcl::PointXYZI> map_0_point_cloud;
 	pcl::PointCloud<pcl::PointXYZI> map_1_point_cloud;
 	exploration::map_merger merger;
-
+	exploration::cell_list updated_cell_list;
 
 };
 
