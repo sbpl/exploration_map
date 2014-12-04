@@ -32,19 +32,20 @@ exploration::exploration_map::~exploration_map()
 bool exploration::exploration_map::update_map(const sensor_update::sensor_update& update, cell_list & updated_cells)
 {
 	//apply update procedure depending on update type
+	cell_list sensor_updated_cells;
 	auto t = update.get_type();
 	switch (t)
 	{
 	case sensor_update::sensor_update_type::lidar:
 	{
 		auto lidar_update = dynamic_cast<const sensor_update::lidar_update&>(update);
-		update_occupancy_map(lidar_update, updated_cells);
+		update_occupancy_map(lidar_update, sensor_updated_cells);
 		break;
 	}
 	case sensor_update::sensor_update_type::camera:
 	{
 		auto camera_update = dynamic_cast<const sensor_update::camera_update&>(update);
-		update_observation_map(camera_update, updated_cells);
+		update_observation_map(camera_update, sensor_updated_cells);
 		break;
 	}
 	default:
@@ -53,7 +54,7 @@ bool exploration::exploration_map::update_map(const sensor_update::sensor_update
 	}
 
 	//update exploration map from updated cells
-	return update_exploration_map(updated_cells);
+	return update_exploration_map(sensor_updated_cells, updated_cells);
 }
 
 const exploration::generic_map<exploration::exploration_type>* exploration::exploration_map::get_exploration_map()
@@ -168,10 +169,10 @@ exploration::cell exploration::exploration_map::map_frame(const cell& c)
 	return k;
 }
 
-bool exploration::exploration_map::update_exploration_map(const cell_list& updated_cells)
+bool exploration::exploration_map::update_exploration_map(const cell_list& sensor_update_cells, cell_list & updated_cells)
 {
 	//for each updated cell
-	for (auto a : updated_cells.list)
+	for (auto a : sensor_update_cells.list)
 	{
 		bool occupied = false;
 		bool explored = false;
@@ -194,6 +195,8 @@ bool exploration::exploration_map::update_exploration_map(const cell_list& updat
 			explored = true;
 		}
 
+		auto prev_value = exp_map[a.X][a.Y][a.Z];
+
 		//update value
 		exp_map[a.X][a.Y][a.Z] = exploration_type::unknown;
 		if (unoccupied)
@@ -207,6 +210,12 @@ bool exploration::exploration_map::update_exploration_map(const cell_list& updat
 		if (occupied)
 		{
 			exp_map[a.X][a.Y][a.Z] = exploration_type::occupied;
+		}
+
+		//if exploration cell changed, add to list of updated cells
+		if(prev_value != exp_map[a.X][a.Y][a.Z])
+		{
+			updated_cells.push_back(a);
 		}
 
 	}

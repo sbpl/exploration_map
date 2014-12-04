@@ -337,7 +337,7 @@ private:
 
 	bool update_observation_map(const sensor_update::camera_update & update, cell_list & updated_cells);
 
-	bool update_exploration_map(const cell_list & updated_cells);
+	bool update_exploration_map(const cell_list& sensor_update_cells, cell_list & updated_cells);
 
 	exploration_map_config config_;
 	pose disc_origin_;
