@@ -219,7 +219,7 @@ bool exploration_map_node::get_lateset_pose_from_tf(geometry_msgs::PoseStamped& 
 {
 	auto input_pose = pose;
 	input_pose.header.frame_id = pose_name;
-	input_pose.header.stamp = ros::Time::now();
+	input_pose.header.stamp = ros::Time(0);
 	input_pose.pose.position.x = 0;
 	input_pose.pose.position.y = 0;
 	input_pose.pose.position.z = 0;
@@ -238,6 +238,8 @@ bool exploration_map_node::get_lateset_pose_from_tf(geometry_msgs::PoseStamped& 
 		ROS_ERROR("ERROR: could not get pose from tf\n, %s", e.what());
 		return false;
 	}
+	pose.header.stamp = ros::Time::now();
+
 	tf::Quaternion bt;
 	tf::quaternionMsgToTF(pose.pose.orientation, bt);
 
@@ -496,11 +498,8 @@ void exploration_map_node::publish_exploration_map_update()
 		case exploration::exploration_type::explored:
 			p.intensity = 50;
 			break;
-		case exploration::exploration_type::unoccupied:
-			p.intensity = 0;
-			break;
 		default:
-			continue;
+			p.intensity = 0;
 			break;
 		}
 		points.push_back(p);
