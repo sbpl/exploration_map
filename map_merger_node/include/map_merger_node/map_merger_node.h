@@ -68,7 +68,14 @@ private:
 
 	void get_point_cloud_from_map_update(const exploration::cell_list & cells, std::vector<pcl::PointXYZI> & points);
 
-	void transform_pose_stamped_with_origin(geometry_msgs::PoseStamped & pose, const exploration::pose * origin);
+	void transform_pose_stamped_to_master_map_frame(geometry_msgs::PoseStamped & pose, const exploration::pose * origin);
+
+	void transform_pose_stamped_to_local_map_frame(geometry_msgs::PoseStamped & pose, const exploration::pose * origin);
+
+	void transform_pose_stamped_with_origin(geometry_msgs::PoseStamped & pose, const exploration::pose * origin, bool inverse);
+
+
+	void goal_list_callback(const nav_msgs::PathConstPtr & msg);
 
 	//config variables
 	std::string frame_name;
@@ -85,6 +92,7 @@ private:
 	std::string robot_1_map_name;
 	std::string robot_0_pose_name;
 	std::string robot_1_pose_name;
+	std::string goal_list_name;
 	double scan_match_angular_res;
 	double scan_match_metric_res;
 	int scan_match_dx;
@@ -104,6 +112,7 @@ private:
 	ros::Subscriber robot_1_map_subscriber;
 	ros::Subscriber robot_0_pose_subscriber;
 	ros::Subscriber robot_1_pose_subscriber;
+	ros::Subscriber goal_list_subscriber;
 
 	//ros publishers
 	ros::Publisher map_publisher;
@@ -113,6 +122,8 @@ private:
 	ros::Publisher robot_1_pose_publisher;
 	ros::Publisher robot_0_pose_publisher;
 	ros::Publisher robot_poses_publisher;
+	ros::Publisher robot_0_goal_publisher;
+	ros::Publisher robot_1_goal_publisher;
 
 	//variables
 	pcl::PointCloud<pcl::PointXYZI> map_0_point_cloud;

@@ -15,6 +15,9 @@ robot_1_map_name: /Map2/exploration_map_node/exploration_map_update
 #robot pose names
 robot_0_pose_name: /Map1/exploration_map_node/robot_pose
 robot_1_pose_name: /Map2/exploration_map_node/robot_pose
+
+#goal list name
+goal_list_name: /robot_goals
  
 #scan matching
 scan_match_ang_res: 0.05
