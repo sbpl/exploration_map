@@ -354,3 +354,8 @@ int exploration::map_merger::get_origin(int map_id, const pose*& origin)
 
 	return 1;
 }
+
+bool exploration::map_merger::origins_are_initialized()
+{
+	return origins_initialized_;
+}

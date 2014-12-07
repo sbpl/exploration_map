@@ -91,6 +91,8 @@ public:
 
 	int get_master_map( const generic_map<exploration_type>*& map);
 
+	bool origins_are_initialized();
+
 private:
 
 

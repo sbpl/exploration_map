@@ -20,6 +20,7 @@ map_merger_node::~map_merger_node()
 void map_merger_node::initialize()
 {
 	number_of_maps = 2;
+	robot_poses.resize(number_of_maps);
 	setup_ros();
 	initialize_map_merger();
 }
@@ -68,6 +69,7 @@ void map_merger_node::setup_ros()
 	map_1_publisher = nh.advertise<pcl::PointCloud<pcl::PointXYZI> >("map1", 1);
 	robot_0_pose_publisher = nh.advertise<geometry_msgs::PoseStamped>("pose0", 1);
 	robot_1_pose_publisher = nh.advertise<geometry_msgs::PoseStamped>("pose1", 1);
+	robot_poses_publisher = nh.advertise<nav_msgs::Path>("robot_poses",1);
 }
 
 int main(int argc, char ** argv)
@@ -81,17 +83,24 @@ int main(int argc, char ** argv)
 
 void map_merger_node::map_publish_callback(const ros::TimerEvent& event)
 {
-	ROS_ERROR("publish map");
-	publish_master_map();
 
 	//publish map 0 and 1 for debugging purposes
-//	publish_inner_maps();
+	//	publish_inner_maps();
 
-	//publish map update
-	publish_map_update();
-	updated_cell_list.list.clear();
+	if (merger.origins_are_initialized())
+	{
+		ROS_ERROR("publish map");
+		publish_master_map();
 
-	//publish robot goals: todo
+		//publish map update
+		publish_map_update();
+		updated_cell_list.list.clear();
+
+		//publish robot poses
+		publish_robot_poses();
+
+		//publish robot goals: todo
+	}
 
 }
 
@@ -239,6 +248,9 @@ void map_merger_node::robot_0_pose_callback(const geometry_msgs::PoseStamped::Co
 	ori = p.pose.orientation;
 	ROS_INFO("transformed to %f %f %f, %f %f %f %f", pos.x, pos.y, pos.z, ori.w, ori.x, ori.y, ori.z);
 
+	//assign to list of poses
+	robot_poses[0] = p;
+
 	//publish pose
 	publish_pose(p, robot_0_pose_publisher);
 }
@@ -263,13 +275,19 @@ void map_merger_node::robot_1_pose_callback(const geometry_msgs::PoseStamped::Co
 	ori = p.pose.orientation;
 	ROS_INFO("transformed to %f %f %f, %f %f %f %f", pos.x, pos.y, pos.z, ori.w, ori.x, ori.y, ori.z);
 
+	//assign to list of poses
+	robot_poses[1] = p;
+
 	//publish pose
 	publish_pose(p, robot_1_pose_publisher);
 }
 
 void map_merger_node::publish_pose(const geometry_msgs::PoseStamped& pose, const ros::Publisher& pub)
 {
-	pub.publish(pose);
+	if (merger.origins_are_initialized())
+	{
+		pub.publish(pose);
+	}
 }
 
 void map_merger_node::get_point_cloud_from_map(const exploration::generic_map<exploration::exploration_type>* map,
@@ -365,6 +383,16 @@ void map_merger_node::publish_inner_maps()
 	get_point_cloud_from_map(map1, map1_cloud);
 	publish_point_cloud(map0_cloud, map_0_publisher);
 	publish_point_cloud(map1_cloud, map_1_publisher);
+}
+
+void map_merger_node::publish_robot_poses()
+{
+	nav_msgs::Path path_poses;
+	for(auto & p : robot_poses)
+	{
+		path_poses.poses.push_back(p);
+	}
+	robot_poses_publisher.publish(path_poses);
 }
 
 void map_merger_node::transform_pose_stamped_with_origin(geometry_msgs::PoseStamped& pose, const exploration::pose* origin)

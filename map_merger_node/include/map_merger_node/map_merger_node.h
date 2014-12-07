@@ -12,6 +12,7 @@
 #include <string>
 #include <ros/ros.h>
 #include "ros/time.h"
+#include <nav_msgs/Path.h>
 #include <geometry_msgs/Point.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <exploration_map/exploration_map.h>
@@ -21,7 +22,7 @@
 #include <tf/transform_listener.h>
 #include <algorithm>
 #include <map_merger/map_merger.h>
-#include <tf/transform_listener.h>
+
 
 class map_merger_node
 {
@@ -50,6 +51,8 @@ private:
 	void publish_point_cloud(const std::vector<pcl::PointXYZI> & points, const ros::Publisher & pub);
 
 	void publish_pose(const geometry_msgs::PoseStamped & pose, const ros::Publisher & pub);
+
+	void publish_robot_poses();
 
 	void publish_inner_maps();
 
@@ -109,12 +112,14 @@ private:
 	ros::Publisher map_1_publisher;
 	ros::Publisher robot_1_pose_publisher;
 	ros::Publisher robot_0_pose_publisher;
+	ros::Publisher robot_poses_publisher;
 
 	//variables
 	pcl::PointCloud<pcl::PointXYZI> map_0_point_cloud;
 	pcl::PointCloud<pcl::PointXYZI> map_1_point_cloud;
 	exploration::map_merger merger;
 	exploration::cell_list updated_cell_list;
+	std::vector<geometry_msgs::PoseStamped> robot_poses;
 
 };
 
