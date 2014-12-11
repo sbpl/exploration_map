@@ -9,12 +9,12 @@ map_size_y: 700
 map_size_z: 120
  
 #map names
-robot_0_map_name: /Map1/exploration_map_node/exploration_map_update
-robot_1_map_name: /Map2/exploration_map_node/exploration_map_update
+robot_0_map_name: /exploration_map_node/exploration_map_update
+robot_1_map_name: /exploration_map_node/exploration_map_update
 
 #robot pose names
-robot_0_pose_name: /Map1/exploration_map_node/robot_pose
-robot_1_pose_name: /Map2/exploration_map_node/robot_pose
+robot_0_pose_name: /exploration_map_node/robot_pose
+robot_1_pose_name: /exploration_map_node/robot_pose
 
 #goal list name
 goal_list_name: /robot_goals

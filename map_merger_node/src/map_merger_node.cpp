@@ -72,7 +72,7 @@ void map_merger_node::setup_ros()
 	robot_0_pose_publisher = nh.advertise<geometry_msgs::PoseStamped>("pose0", 1);
 	robot_1_pose_publisher = nh.advertise<geometry_msgs::PoseStamped>("pose1", 1);
 	robot_poses_publisher = nh.advertise<nav_msgs::Path>("robot_poses", 1);
-	robot_0_goal_publisher = nh.advertise<geometry_msgs::PoseStamped>("goal0", 1);
+	robot_0_goal_publisher = nh.advertise<geometry_msgs::PoseStamped>("next_goal", 1);
 	robot_1_goal_publisher = nh.advertise<geometry_msgs::PoseStamped>("goal1", 1);
 
 }
