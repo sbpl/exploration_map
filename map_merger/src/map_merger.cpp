@@ -66,7 +66,8 @@ int exploration::map_merger::receive_map_update(const map_update& update, cell_l
 
 	//update specified map: no transform required
 	printf("update map %d\n", update.map_id);
-	update_map(update, pose(), maps_[map_id], NULL);
+	cell_list locally_updated_cells;
+	update_map(update, pose(), maps_[map_id], &locally_updated_cells);
 
 	//increment counter
 	map_counter_[map_id]++;
@@ -103,6 +104,11 @@ int exploration::map_merger::receive_map_update(const map_update& update, cell_l
 		//update master map frame using its transform from child frame
 		printf("update master map with map id %d\n", (int) map_id);
 		update_map(update, map_origins_[map_id], master_map_, &updated_cells);
+	}
+	else
+	{
+		//if not time to update master return list of updated cells as those that were updated on the local map
+		updated_cells.list.insert(updated_cells.list.end(), locally_updated_cells.list.begin(), locally_updated_cells.list.end());
 	}
 
 	return 1;
