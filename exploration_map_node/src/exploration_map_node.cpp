@@ -125,6 +125,7 @@ void exploration_map_node::horizontal_lidar_callback(const sensor_msgs::LaserSca
 int main(int argc, char** argv)
 {
 	ros::init(argc, argv, "exploration_map_node");
+	ros::Duration(10.0);
 	exploration_map_node en;
 	ros::spin();
 }
