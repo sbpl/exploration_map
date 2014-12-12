@@ -4,4 +4,8 @@
 
 <include file="$(find utacc_multimaster)/launch/segbot_gateway.launch"/> 
 
+<node name="relay1" pkg="topic_tools" type="relay" args="segbot_map segbot_map_e2"/>
+
+<node name="relay2" pkg="topic_tools" type="relay" args="segbot_pose segbot_pose_e2"/>
+
 </launch>
