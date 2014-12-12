@@ -47,6 +47,8 @@ void map_merger_node::setup_ros()
 	ph.getParam("scan_match_dy", scan_match_dy);
 	ph.getParam("scan_match_dz", scan_match_dz);
 	ph.getParam("scan_match_dyaw", scan_match_dyaw);
+        ph.getParam("goal_0_name", goal_0_name);
+        ph.getParam("goal_1_name", goal_1_name);
 
 	ROS_INFO("frame %s\n", frame_name.c_str());
 	ROS_INFO("map_resolution %f\n", map_resolution);
@@ -72,8 +74,8 @@ void map_merger_node::setup_ros()
 	robot_0_pose_publisher = nh.advertise<geometry_msgs::PoseStamped>("pose0", 1);
 	robot_1_pose_publisher = nh.advertise<geometry_msgs::PoseStamped>("pose1", 1);
 	robot_poses_publisher = nh.advertise<nav_msgs::Path>("robot_poses", 1);
-	robot_0_goal_publisher = nh.advertise<geometry_msgs::PoseStamped>("next_goal", 1);
-	robot_1_goal_publisher = nh.advertise<geometry_msgs::PoseStamped>("goal1", 1);
+	robot_0_goal_publisher = nh.advertise<geometry_msgs::PoseStamped>(goal_0_name.c_str(), 1);
+	robot_1_goal_publisher = nh.advertise<geometry_msgs::PoseStamped>(goal_1_name.c_str(), 1);
 
 }
 

@@ -9,12 +9,16 @@ map_size_y: 700
 map_size_z: 120
  
 #map names
-robot_0_map_name: /exploration_map_node/exploration_map_update
-robot_1_map_name: /exploration_map_node/exploration_map_update
+robot_0_map_name: /segbot_map_e2
+robot_1_map_name: /hexa_map_e2
 
 #robot pose names
-robot_0_pose_name: /exploration_map_node/robot_pose
-robot_1_pose_name: /exploration_map_node/robot_pose
+robot_0_pose_name: /segbot_pose_e2
+robot_1_pose_name: /hexa_pose_e2
+
+#goal names
+goal_0_name: /segbot_goal_e2
+goal_1_name: /hexa_goal_e2
 
 #goal list name
 goal_list_name: /robot_goals

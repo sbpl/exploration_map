@@ -99,6 +99,8 @@ private:
 	int scan_match_dy;
 	int scan_match_dz;
 	int scan_match_dyaw;
+        std::string goal_0_name;
+        std::string goal_1_name;
 
 	//ros node handlers
 	ros::NodeHandle nh;
