@@ -72,7 +72,7 @@ private:
 
 	void publish_point_cloud(const std::vector<pcl::PointXYZI> & points, const ros::Publisher & pub);
 
-	bool get_lateset_pose_from_tf(geometry_msgs::PoseStamped & pose, const std::string & pose_name);
+	bool get_lateset_pose_from_tf(geometry_msgs::PoseStamped & pose, const std::string & pose_name, const ros::Time & time);
 
 	bool initialize_exploration_map();
 
@@ -82,7 +82,7 @@ private:
 
 	void publish_exploration_map_update();
 
-	void update_robot_pose();
+	void update_robot_pose(const ros::Time & time);
 
 	void publish_robot_pose();
 

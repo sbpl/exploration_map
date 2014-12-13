@@ -58,9 +58,9 @@ void exploration_map_node::ros_configure()
 	ROS_INFO("publish debugging messages (%d) \n", publish_debug_messages);
 
 	//subscribe
-	horiz_lidar_sub = n.subscribe(horizontal_lidar_topic_name, 1, &exploration_map_node::horizontal_lidar_callback, this);
-	camera_scan_sub = n.subscribe(camera_scan_topic_name, 1, &exploration_map_node::camera_scan_callback, this);
-	verti_lidar_sub = n.subscribe(vertical_lidar_topic_name, 1, &exploration_map_node::vertical_lidar_callback, this);
+	horiz_lidar_sub = n.subscribe(horizontal_lidar_topic_name, 50, &exploration_map_node::horizontal_lidar_callback, this);
+	camera_scan_sub = n.subscribe(camera_scan_topic_name, 50, &exploration_map_node::camera_scan_callback, this);
+	verti_lidar_sub = n.subscribe(vertical_lidar_topic_name, 50, &exploration_map_node::vertical_lidar_callback, this);
 
 	//timer
 	map_publish_timer = n.createTimer(ros::Duration(map_publish_rate), &exploration_map_node::map_publish_timer_callback, this);
@@ -91,7 +91,7 @@ void exploration_map_node::horizontal_lidar_callback(const sensor_msgs::LaserSca
 	}
 
 	geometry_msgs::PoseStamped pose;
-	if (!get_lateset_pose_from_tf(pose, horizontal_lidar_pose_tf_name))
+	if (!get_lateset_pose_from_tf(pose, horizontal_lidar_pose_tf_name, msg->header.stamp))
 	{
 		ROS_ERROR("Error: could not process horizontal lidar because latest pose could not be retrieved");
 		return;
@@ -115,7 +115,7 @@ void exploration_map_node::horizontal_lidar_callback(const sensor_msgs::LaserSca
 	}
 
 	//update_robot_pose
-	update_robot_pose();
+	update_robot_pose(msg->header.stamp);
 
 	//update exploration map
 	update_exploration_map(update);
@@ -216,11 +216,11 @@ void exploration_map_node::publish_point_cloud(const std::vector<pcl::PointXYZI>
 	pub.publish(cloud);
 }
 
-bool exploration_map_node::get_lateset_pose_from_tf(geometry_msgs::PoseStamped& pose, const std::string & pose_name)
+bool exploration_map_node::get_lateset_pose_from_tf(geometry_msgs::PoseStamped& pose, const std::string & pose_name, const ros::Time & time)
 {
 	auto input_pose = pose;
 	input_pose.header.frame_id = pose_name;
-	input_pose.header.stamp = ros::Time(0);
+	input_pose.header.stamp = time;
 	input_pose.pose.position.x = 0;
 	input_pose.pose.position.y = 0;
 	input_pose.pose.position.z = 0;
@@ -239,7 +239,6 @@ bool exploration_map_node::get_lateset_pose_from_tf(geometry_msgs::PoseStamped& 
 		ROS_ERROR("ERROR: could not get pose from tf\n, %s", e.what());
 		return false;
 	}
-	pose.header.stamp = ros::Time::now();
 
 	tf::Quaternion bt;
 	tf::quaternionMsgToTF(pose.pose.orientation, bt);
@@ -296,7 +295,7 @@ void exploration_map_node::camera_scan_callback(const camera_node::camera_scanCo
 
 	//get camera pose
 	geometry_msgs::PoseStamped camera_pose;
-	if (!get_lateset_pose_from_tf(camera_pose, camera_pose_tf_name))
+	if (!get_lateset_pose_from_tf(camera_pose, camera_pose_tf_name, msg->header.stamp))
 	{
 		ROS_ERROR("could not retrieve pose for camera scan");
 		return;
@@ -320,7 +319,7 @@ void exploration_map_node::camera_scan_callback(const camera_node::camera_scanCo
 	}
 
 	//update_robot_pose
-	update_robot_pose();
+	update_robot_pose(msg->header.stamp);
 
 	//update exploration map
 	update_exploration_map(update);
@@ -391,7 +390,7 @@ void exploration_map_node::vertical_lidar_callback(const sensor_msgs::LaserScanC
 	}
 
 	geometry_msgs::PoseStamped pose;
-	if (!get_lateset_pose_from_tf(pose, vertical_lidar_pose_tf_name))
+	if (!get_lateset_pose_from_tf(pose, vertical_lidar_pose_tf_name, msg->header.stamp))
 	{
 		ROS_ERROR("Error: could not process vertical lidar because latest pose could not be retrieved");
 		return;
@@ -415,7 +414,7 @@ void exploration_map_node::vertical_lidar_callback(const sensor_msgs::LaserScanC
 	}
 
 	//update_robot_pose
-	update_robot_pose();
+	update_robot_pose(msg->header.stamp);
 
 	//update exploration map
 	update_exploration_map(update);
@@ -434,7 +433,7 @@ void exploration_map_node::publish_exploration_map()
 	double origin_z = con->map_config_.origin.pos.z;
 
 	std::vector<pcl::PointXYZI> points;
-	points.reserve(size_x*size_y*size_z);
+	points.reserve(size_x * size_y * size_z);
 	for (int x = 0; x < size_x; x++)
 	{
 		for (int y = 0; y < size_y; y++)
@@ -444,9 +443,9 @@ void exploration_map_node::publish_exploration_map()
 			{
 
 				pcl::PointXYZI p;
-				p.x = exploration::exploration_map::continuous(x,res) + origin_x;
-				p.y = exploration::exploration_map::continuous(y,res) + origin_y;
-				p.z = exploration::exploration_map::continuous(z,res) + origin_z;
+				p.x = exploration::exploration_map::continuous(x, res) + origin_x;
+				p.y = exploration::exploration_map::continuous(y, res) + origin_y;
+				p.z = exploration::exploration_map::continuous(z, res) + origin_z;
 
 				exploration::exploration_type val = map->at(x, y, z);
 
@@ -482,14 +481,14 @@ void exploration_map_node::publish_exploration_map_update()
 	std::vector<pcl::PointXYZI> points;
 	points.reserve(updated_cell_list.size());
 
-	for(auto c : updated_cell_list.list)
+	for (auto c : updated_cell_list.list)
 	{
 		pcl::PointXYZI p;
-		p.x = exploration::exploration_map::continuous(c.X,res) + origin_x;
-		p.y = exploration::exploration_map::continuous(c.Y,res) + origin_y;
-		p.z = exploration::exploration_map::continuous(c.Z,res) + origin_z;
+		p.x = exploration::exploration_map::continuous(c.X, res) + origin_x;
+		p.y = exploration::exploration_map::continuous(c.Y, res) + origin_y;
+		p.z = exploration::exploration_map::continuous(c.Z, res) + origin_z;
 
-		exploration::exploration_type val = map->at(c.X,c.Y,c.Z);
+		exploration::exploration_type val = map->at(c.X, c.Y, c.Z);
 
 		switch (val)
 		{
@@ -506,12 +505,11 @@ void exploration_map_node::publish_exploration_map_update()
 		points.push_back(p);
 	}
 	publish_point_cloud(points, exploration_map_update_pub);
-
 }
 
-void exploration_map_node::update_robot_pose()
+void exploration_map_node::update_robot_pose(const ros::Time & time)
 {
-	if(!get_lateset_pose_from_tf(current_robot_pose, robot_pose_tf_name ))
+	if (!get_lateset_pose_from_tf(current_robot_pose, robot_pose_tf_name, time))
 	{
 		ROS_ERROR("could not get current robot pose");
 	}
