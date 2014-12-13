@@ -33,4 +33,4 @@
 
   map_publish_rate: 1.0
   number_of_scans_to_skip: 0
-  publish_debug_messages: true
+  publish_debug_messages: false
