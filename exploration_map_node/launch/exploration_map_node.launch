@@ -8,7 +8,7 @@
 </node>
 
 <node pkg="camera_node" type="camera_node" respawn="false" name="camera_scan_node"  >
-
+<rosparam file = "$(find camera_node)/config/camera_node_config.yaml" command="load"  />
 </node>
 
 </launch>
