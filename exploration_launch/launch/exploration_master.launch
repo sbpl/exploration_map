@@ -1,11 +1,11 @@
 <launch>
 
+<include file="$(find utacc_multimaster)/launch/utacc_hub.launch"/>
+
 <include file="$(find map_merger_node)/launch/map_merger_node.launch"/> 
 
 <include file="$(find explore3d)/launch/explore-3d.launch"/> 
 
-<include file="$(find utacc_multimaster)/launch/utacc_hub.launch"/> 
-
-<include file="$(find utacc_multimaster)/launch/laptop_gateway.launch"/> 
+<include file="$(find utacc_multimaster)/launch/epmm_gateway.launch"/> 
 
 </launch>
