@@ -12,6 +12,7 @@
 #include <string>
 #include <iostream>
 #include <generic_transform/generic_transform.h>
+#include <type_traits>
 
 /**
  *
@@ -139,7 +140,7 @@ public:
 
 enum class sensor_update_type
 {
-	generic, lidar, camera
+	generic, lidar, camera, robot_volume
 };
 
 /**
@@ -243,6 +244,38 @@ public:
 	sensor_update_type get_type() const;
 
 private:
+
+	/**
+	 *
+	 * @param distance
+	 * @param end_distance
+	 * @return
+	 */
+	int get_ray_cost(double distance, double end_distance) const;
+
+};
+
+/**
+ *
+ */
+class robot_volume_update: public sensor_update
+{
+	public:
+
+	robot_volume_update();
+
+	robot_volume_update(pose pose, double height, double radius);
+
+	bool get_transformed_sensor_ends(std::vector<position> & trans_sensor_ends) const;
+
+	sensor_update_type get_type() const;
+
+	private:
+
+	double radius_;
+	double height_;
+
+	sensor_reading generate_reading(double radius) const;
 
 	/**
 	 *

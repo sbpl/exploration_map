@@ -189,9 +189,7 @@ pose sensor_update::get_pose() const
 	return pose_;
 }
 
-}
-
-bool sensor_update::camera_update::get_transformed_sensor_ends(std::vector<position>& trans_sensor_ends) const
+bool camera_update::get_transformed_sensor_ends(std::vector<position>& trans_sensor_ends) const
 {
 
 	//sanity check
@@ -232,4 +230,116 @@ bool sensor_update::camera_update::get_transformed_sensor_ends(std::vector<posit
 	}
 
 	return true;
+}
+
+robot_volume_update::robot_volume_update() :
+		sensor_update()
+{
+	height_ = 0;
+	radius_ = 0;
+}
+
+robot_volume_update::robot_volume_update(pose pose, double height, double radius) :
+		sensor_update(pose, sensor_reading())
+{
+	height_ = height;
+	radius_ = radius;
+	reading_ = generate_reading(radius_);
+}
+
+bool robot_volume_update::get_transformed_sensor_ends(std::vector<position>& trans_sensor_ends) const
+{
+
+	//sanity check
+	if (reading_.rays.size() == 0)
+	{
+		return false;
+	}
+
+	double min_height = -height_ / 2;
+	double max_height = height_ / 2;
+	double height_res = 0.05;
+	double current_height = min_height;
+
+	//create position for each distance/angle/height triplet given pose
+	std::vector<position> sensor_end_pos;
+	while (true)
+	{
+		for (size_t i = 0; i < reading_.rays.size(); i++)
+		{
+			double yaw = reading_.rays[i].angle.yaw;
+			double roll = reading_.rays[i].angle.roll;
+			double distance = reading_.rays[i].distance;
+			double base_quat[4];
+			generic_transform::convert_eular_to_quaterion(roll, 0, yaw, base_quat);
+			orientation base_orient(base_quat);
+			position base_pos(distance, 0, current_height);
+			position pos = generic_transform::rotate_position(base_pos, base_orient);
+			sensor_end_pos.push_back(pos);
+		}
+
+		if (current_height == max_height)
+		{
+			break;
+		}
+
+		current_height += height_res;
+		if (current_height - max_height > 0)
+		{
+			current_height = max_height;
+		}
+
+	}
+
+	//transform ends to pose taken with scan
+	for (auto a : sensor_end_pos)
+	{
+		a = generic_transform::transform_position_from_frame(a, pose_);
+		trans_sensor_ends.push_back(a);
+	}
+
+	return true;
+}
+
+sensor_update_type robot_volume_update::get_type() const
+{
+	return sensor_update_type::robot_volume;
+}
+
+sensor_reading robot_volume_update::generate_reading(double radius) const
+{
+	sensor_reading reading;
+	double pi = 3.14159;
+	double res = 5.0 * (pi / 180);
+	size_t count = static_cast<size_t>(2 * pi / res);
+	reading.rays.reserve(count);
+	double ang = 0;
+	while (true)
+	{
+		sensor_ray ray;
+		ray.angle.yaw = ang;
+		ray.angle.roll = 0;
+		ray.distance = radius;
+		reading.rays.push_back(ray);
+
+		if (ang == 2 * pi)
+		{
+			break;
+		}
+
+		ang += res;
+
+		if (ang > 2 * pi)
+		{
+			ang = 2 * pi;
+		}
+	}
+	return reading;
+}
+
+int robot_volume_update::get_ray_cost(double distance, double end_distance) const
+{
+	return 0;
+}
+
 }
