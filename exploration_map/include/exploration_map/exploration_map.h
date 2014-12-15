@@ -256,14 +256,14 @@ public:
 
 	occupancy_map_config()
 	{
-		update_increment_value = 0;
-		update_decrement_value = 0;
+		lidar_update_increment_value = 0;
+		lidar_update_decrement_value = 0;
 		occ_threshold = 0;
 		unnoc_threshold = 0;
 	}
 
-	double update_increment_value;
-	double update_decrement_value;
+	double lidar_update_increment_value;
+	double lidar_update_decrement_value;
 	double occ_threshold;
 	double unnoc_threshold;
 };
@@ -333,9 +333,9 @@ public:
 
 private:
 
-	bool update_occupancy_map(const sensor_update::lidar_update & update, cell_list & updated_cells);
+	bool update_occupancy_map(const sensor_update::sensor_update & update, cell_list & updated_cells, double increment_value, double decrement_value);
 
-	bool update_observation_map(const sensor_update::camera_update & update, cell_list & updated_cells);
+	bool update_observation_map(const sensor_update::sensor_update & update, cell_list & updated_cells);
 
 	bool update_exploration_map(const cell_list& sensor_update_cells, cell_list & updated_cells);
 

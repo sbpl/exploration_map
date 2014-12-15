@@ -38,14 +38,19 @@ bool exploration::exploration_map::update_map(const sensor_update::sensor_update
 	{
 	case sensor_update::sensor_update_type::lidar:
 	{
-		auto lidar_update = dynamic_cast<const sensor_update::lidar_update&>(update);
-		update_occupancy_map(lidar_update, sensor_updated_cells);
+		update_occupancy_map(update, sensor_updated_cells, config_.occ_map_config_.lidar_update_increment_value, config_.occ_map_config_.lidar_update_decrement_value);
 		break;
 	}
 	case sensor_update::sensor_update_type::camera:
 	{
-		auto camera_update = dynamic_cast<const sensor_update::camera_update&>(update);
-		update_observation_map(camera_update, sensor_updated_cells);
+		update_observation_map(update, sensor_updated_cells);
+		break;
+	}
+	case sensor_update::sensor_update_type::robot_volume:
+	{
+		update_occupancy_map(update, sensor_updated_cells,1.0,1.0);
+		update_exploration_map(sensor_updated_cells, updated_cells);
+		update_observation_map(update, sensor_updated_cells);
 		break;
 	}
 	default:
@@ -82,7 +87,7 @@ bool exploration::exploration_map::initialize(exploration_map_config _config)
 	return true;
 }
 
-bool exploration::exploration_map::update_occupancy_map(const sensor_update::lidar_update& update, cell_list& updated_cells)
+bool exploration::exploration_map::update_occupancy_map(const sensor_update::sensor_update& update, cell_list& updated_cells, double increment_value, double decrement_value)
 {
 	std::vector<sensor_update::discrete_cell> cells;
 	//todo: have this function return cells that line up with frame
@@ -112,14 +117,13 @@ bool exploration::exploration_map::update_occupancy_map(const sensor_update::lid
 		double new_value = prev_val;
 		if (a.value > 0)
 		{
-			new_value += config_.occ_map_config_.update_increment_value;
+			new_value += increment_value;
 		}
 		else
 		{
-			new_value -= config_.occ_map_config_.update_decrement_value;
+			new_value -= decrement_value;
 		}
 		new_value = std::max(std::min(new_value, 1.0), 0.0);
-
 		occupancy_map[current_cell.X][current_cell.Y][current_cell.Z] = new_value;
 
 		//if cell update add to updated list
@@ -213,7 +217,7 @@ bool exploration::exploration_map::update_exploration_map(const cell_list& senso
 		}
 
 		//if exploration cell changed, add to list of updated cells
-		if(prev_value != exp_map[a.X][a.Y][a.Z])
+		if (prev_value != exp_map[a.X][a.Y][a.Z])
 		{
 			updated_cells.push_back(a);
 		}
@@ -231,7 +235,7 @@ const exploration::exploration_map_config* exploration::exploration_map::get_con
 	return &config_;
 }
 
-bool exploration::exploration_map::update_observation_map(const sensor_update::camera_update& update, cell_list& updated_cells)
+bool exploration::exploration_map::update_observation_map(const sensor_update::sensor_update& update, cell_list& updated_cells)
 {
 	std::vector<sensor_update::discrete_cell> cells;
 	update.get_discrete_ray_trace_cells(config_.map_config_.resolution, cells);
@@ -322,5 +326,4 @@ double exploration::exploration_map::continuous(int d, double res)
 	double s = (static_cast<double>(d) * res) + (res / 2.0);
 	return s;
 }
-
 
