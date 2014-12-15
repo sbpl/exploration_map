@@ -13,6 +13,7 @@ exploration_map_node::exploration_map_node() :
 	camera_scan_counter = 0;
 	horizontal_lidar_scan_counter = 0;
 	vertical_lidar_scan_counter = 0;
+	current_robot_pose.pose.orientation.w = 1;
 	ros_configure();
 	initialize_exploration_map();
 }
@@ -50,6 +51,8 @@ void exploration_map_node::ros_configure()
 	pn.getParam("unnocupied_prob_threshold", unnocupied_prob_thresh);
 	pn.getParam("publish_debug_messages", publish_debug_messages);
 	pn.getParam("min_sensor_distance_threshold", min_sensor_distance_threshold);
+	pn.getParam("robot_radius", robot_radius);
+	pn.getParam("robot_height", robot_height);
 
 	ROS_INFO("subscribed to %s and %s\n", horizontal_lidar_pose_tf_name.c_str(), horizontal_lidar_topic_name.c_str());
 	ROS_INFO("subscribed to %s and %s\n", camera_pose_tf_name.c_str(), camera_scan_topic_name.c_str());
@@ -58,12 +61,12 @@ void exploration_map_node::ros_configure()
 	ROS_INFO("publish debugging messages (%d) \n", publish_debug_messages);
 
 	//subscribe
-	horiz_lidar_sub = n.subscribe(horizontal_lidar_topic_name, 50, &exploration_map_node::horizontal_lidar_callback, this);
-	camera_scan_sub = n.subscribe(camera_scan_topic_name, 50, &exploration_map_node::camera_scan_callback, this);
-	verti_lidar_sub = n.subscribe(vertical_lidar_topic_name, 50, &exploration_map_node::vertical_lidar_callback, this);
+	horiz_lidar_sub = n.subscribe(horizontal_lidar_topic_name, 40, &exploration_map_node::horizontal_lidar_callback, this);
+	camera_scan_sub = n.subscribe(camera_scan_topic_name, 40, &exploration_map_node::camera_scan_callback, this);
+	verti_lidar_sub = n.subscribe(vertical_lidar_topic_name, 40, &exploration_map_node::vertical_lidar_callback, this);
 
 	//timer
-	map_publish_timer = n.createTimer(ros::Duration(map_publish_rate), &exploration_map_node::map_publish_timer_callback, this);
+	map_publish_timer = n.createTimer(ros::Duration(1.0/map_publish_rate), &exploration_map_node::map_publish_timer_callback, this);
 
 	//advertise published topics
 	horizontal_lidar_update_pub = pn.advertise<pcl::PointCloud<pcl::PointXYZI> >("horizontal_lidar_update", 1);
@@ -72,6 +75,8 @@ void exploration_map_node::ros_configure()
 	vertical_lidar_update_ray_trace_pub = pn.advertise<pcl::PointCloud<pcl::PointXYZI> >("vertical_lidar_update_ray_trace", 1);
 	camera_update_pub = pn.advertise<pcl::PointCloud<pcl::PointXYZI> >("camera_update", 1);
 	camera_update_ray_trace_pub = pn.advertise<pcl::PointCloud<pcl::PointXYZI> >("camera_update_ray_trace", 1);
+	robot_vol_update_pub = pn.advertise<pcl::PointCloud<pcl::PointXYZI> >("robot_volume_update", 1);
+	robot_vol_update_ray_trace_pub = pn.advertise<pcl::PointCloud<pcl::PointXYZI> >("robot_volume_update_ray_trace",1);
 	exploration_map_pub = pn.advertise<pcl::PointCloud<pcl::PointXYZI> >("exploration_map", 1);
 	exploration_map_update_pub = pn.advertise<pcl::PointCloud<pcl::PointXYZI> >("exploration_map_update", 1);
 	robot_pose_pub = pn.advertise<geometry_msgs::PoseStamped>("robot_pose", 1);
@@ -119,7 +124,6 @@ void exploration_map_node::horizontal_lidar_callback(const sensor_msgs::LaserSca
 
 	//update exploration map
 	update_exploration_map(update);
-
 }
 
 int main(int argc, char** argv)
@@ -169,7 +173,6 @@ void exploration_map_node::publish_sensor_update(const sensor_update::sensor_upd
 
 	std::vector<sensor_update::position> lidar_points;
 	update.get_transformed_sensor_ends(lidar_points);
-
 	//convert to 3d points
 	std::vector<pcl::PointXYZI> points;
 	for (auto & lp : lidar_points)
@@ -188,7 +191,6 @@ void exploration_map_node::publish_sensor_update_ray_trace(const sensor_update::
 {
 	std::vector<sensor_update::discrete_cell> ray_trace_cells;
 	update.get_discrete_ray_trace_cells(map_resolution, ray_trace_cells);
-
 	//convert to 3d points
 	std::vector<pcl::PointXYZI> points;
 	for (auto & cell : ray_trace_cells)
@@ -265,8 +267,8 @@ bool exploration_map_node::initialize_exploration_map()
 
 	//occupancy related config
 	con.occ_map_config_.occ_threshold = occupancy_prob_thresh;
-	con.occ_map_config_.update_decrement_value = lidar_update_decrement;
-	con.occ_map_config_.update_increment_value = lidar_update_increment;
+	con.occ_map_config_.lidar_update_decrement_value = lidar_update_decrement;
+	con.occ_map_config_.lidar_update_increment_value = lidar_update_increment;
 	con.occ_map_config_.unnoc_threshold = unnocupied_prob_thresh;
 
 	exp_map.initialize(con);
@@ -365,6 +367,10 @@ void exploration_map_node::convert_camera_scan_to_sensor_update_ray(const camera
 
 void exploration_map_node::map_publish_timer_callback(const ros::TimerEvent& event)
 {
+
+	//update map with respect to current pose
+	update_exploration_map_from_robot_pose(current_robot_pose);
+
 	publish_exploration_map();
 
 	publish_exploration_map_update();
@@ -518,4 +524,22 @@ void exploration_map_node::update_robot_pose(const ros::Time & time)
 void exploration_map_node::publish_robot_pose()
 {
 	robot_pose_pub.publish(current_robot_pose);
+}
+
+void exploration_map_node::update_exploration_map_from_robot_pose(const geometry_msgs::PoseStamped& pose)
+{
+	sensor_update::pose sense_pose;
+	convert_pose_to_sensor_update_pose(pose, sense_pose);
+	sensor_update::robot_volume_update update(sense_pose, robot_height, robot_radius);
+	if (publish_debug_messages)
+	{
+		// publish transformed points
+		publish_sensor_update(update, robot_vol_update_pub);
+
+		// publish transformed cells
+		publish_sensor_update_ray_trace(update, robot_vol_update_ray_trace_pub);
+	}
+
+	//update exploration map
+	update_exploration_map(update);
 }

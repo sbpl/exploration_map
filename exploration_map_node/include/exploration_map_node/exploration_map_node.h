@@ -86,6 +86,8 @@ private:
 
 	void publish_robot_pose();
 
+	void update_exploration_map_from_robot_pose(const geometry_msgs::PoseStamped & pose);
+
 	double map_resolution;
 	geometry_msgs::Point map_origin;
 	int map_size_x;
@@ -113,6 +115,8 @@ private:
 	double base_height_max;
 	bool publish_debug_messages;
 	double min_sensor_distance_threshold;
+	double robot_radius;
+	double robot_height;
 
 	//node handles
 	ros::NodeHandle n;
@@ -137,6 +141,8 @@ private:
 	ros::Publisher exploration_map_pub;
 	ros::Publisher exploration_map_update_pub;
 	ros::Publisher robot_pose_pub;
+	ros::Publisher robot_vol_update_pub;
+	ros::Publisher robot_vol_update_ray_trace_pub;
 
 	exploration::exploration_map exp_map;
 	exploration::cell_list updated_cell_list;

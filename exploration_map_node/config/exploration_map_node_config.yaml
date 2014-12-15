@@ -11,7 +11,7 @@
   unnocupied_prob_threshold: 0.3
   occupancy_prob_threshold: 0.7
   lidar_update_increment: 1.0
-  lidar_update_decrement: 0.05
+  lidar_update_decrement: 0.1
   min_sensor_distance_threshold: 0.6
 
   #for segbot
@@ -22,6 +22,8 @@
   camera_pose_tf_name: /base_laser_link
   camera_scan_topic_name: /camera_scan_node/camera_scan
   robot_pose_tf_name: /base_footprint
+  robot_radius: 1.0
+  robot_height: 2.0
 
   #for hexarotor
   #horizontal_lidar_pose_tf_name: /fixed_laser_frame
@@ -30,6 +32,9 @@
   #vertical_lidar_topic_name: /panning_laser
   #camera_pose_tf_name: /fixed_laser_frame
   #camera_scan_topic_name: /camera_scan_node/camera_scan
+  #robot_pose_tf_name: /body_frame
+  #robot_radius: 2.0
+  #robot_height: 2.0
 
   map_publish_rate: 1.0
   number_of_scans_to_skip: 0
