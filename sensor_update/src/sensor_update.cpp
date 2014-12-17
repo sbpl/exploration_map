@@ -273,9 +273,34 @@ bool robot_volume_update::get_transformed_sensor_ends(std::vector<position>& tra
 			double base_quat[4];
 			generic_transform::convert_eular_to_quaterion(roll, 0, yaw, base_quat);
 			orientation base_orient(base_quat);
-			position base_pos(distance, 0, current_height);
-			position pos = generic_transform::rotate_position(base_pos, base_orient);
-			sensor_end_pos.push_back(pos);
+
+			//if height at bottom or top, perform for distances up to max
+			double start_distance = distance;
+			double end_distance = distance;
+			double dist_res = 0.05;
+			if (current_height == max_height || current_height == min_height)
+			{
+				start_distance = dist_res;
+			}
+			double current_distance = start_distance;
+			while (true)
+			{
+				position base_pos(current_distance, 0, current_height);
+				position pos = generic_transform::rotate_position(base_pos, base_orient);
+				sensor_end_pos.push_back(pos);
+
+				if (current_distance == end_distance)
+				{
+					break;
+				}
+
+				current_distance += dist_res;
+
+				if (current_distance > end_distance)
+				{
+					current_distance = end_distance;
+				}
+			}
 		}
 
 		if (current_height == max_height)
