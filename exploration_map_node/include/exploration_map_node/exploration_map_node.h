@@ -111,8 +111,7 @@ private:
 	int camera_scan_counter;
 	int horizontal_lidar_scan_counter;
 	int vertical_lidar_scan_counter;
-	double base_height_min;
-	double base_height_max;
+	double ground_plane_height_threshold;
 	bool publish_debug_messages;
 	double min_sensor_distance_threshold;
 	double robot_radius;

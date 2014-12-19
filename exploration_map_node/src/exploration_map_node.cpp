@@ -46,8 +46,7 @@ void exploration_map_node::ros_configure()
 	pn.getParam("camera_scan_topic_name", camera_scan_topic_name);
 	pn.getParam("map_publish_rate", map_publish_rate);
 	pn.getParam("number_of_scans_to_skip", number_of_scans_to_skip);
-	pn.getParam("base_height_min", base_height_min);
-	pn.getParam("base_height_max", base_height_max);
+	pn.getParam("ground_plane_height_threshold", ground_plane_height_threshold);
 	pn.getParam("unnocupied_prob_threshold", unnocupied_prob_thresh);
 	pn.getParam("publish_debug_messages", publish_debug_messages);
 	pn.getParam("min_sensor_distance_threshold", min_sensor_distance_threshold);
@@ -262,8 +261,7 @@ bool exploration_map_node::initialize_exploration_map()
 	con.map_config_.size_x = map_size_x;
 	con.map_config_.size_y = map_size_y;
 	con.map_config_.size_z = map_size_z;
-	con.map_config_.base_height_min = base_height_min;
-	con.map_config_.base_height_max = base_height_max;
+	con.map_config_.ground_plane_height_threshold = ground_plane_height_threshold;
 
 	//occupancy related config
 	con.occ_map_config_.occ_threshold = occupancy_prob_thresh;
