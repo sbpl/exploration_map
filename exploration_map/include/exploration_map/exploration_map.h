@@ -233,16 +233,14 @@ public:
 		size_x = 0;
 		size_y = 0;
 		size_z = 0;
-		base_height_min = 0;
-		base_height_max = 0;
+		ground_plane_height_threshold = 0;
 	}
 
 	double resolution;
 	int size_x;
 	int size_y;
 	int size_z;
-	double base_height_min;
-	double base_height_max;
+	double ground_plane_height_threshold;
 	pose origin;
 
 };

@@ -194,7 +194,7 @@ bool exploration::exploration_map::update_exploration_map(const cell_list& senso
 		}
 
 		//mark occupied points on ground plane as unoccupied
-		if(occupied && a.Z == 0)
+		if(occupied && a.Z < discretize(config_.map_config_.ground_plane_height_threshold,config_.map_config_.resolution))
 		{
 			occupied = false;
 			unoccupied = true;
