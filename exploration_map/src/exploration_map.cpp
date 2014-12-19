@@ -193,6 +193,13 @@ bool exploration::exploration_map::update_exploration_map(const cell_list& senso
 			unoccupied = true;
 		}
 
+		//mark occupied points on ground plane as unoccupied
+		if(occupied && a.Z == 0)
+		{
+			occupied = false;
+			unoccupied = true;
+		}
+
 		//check if explored
 		if (observation_map[a.X][a.Y][a.Z] > 0)
 		{
