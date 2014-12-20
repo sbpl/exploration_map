@@ -19,39 +19,42 @@
 #include <iomanip>
 
 /**
- *
+ * \brief namespace for exploration map stuff
  */
 namespace exploration
 {
 
 /**
- *
+ * \brief enum used to disambiguate between types of exploration values
  */
 enum class exploration_type
 {
-	unknown, explored, occupied, unoccupied
+	unknown /**value not known*/,
+	explored /**value is free and has also been seen by camera*/,
+	occupied /**value is an obstacles */,
+	unoccupied /**value is a free space */
 };
 
 /**
- * todo
+ * \brief a construct for a 3d point in space
  */
 class point
 {
 public:
 
 	/**
-	 *
+	 * \brief default constructor
 	 */
 	point();
 
 	/**
-	 *
+	 * \brief copy constructor
 	 * @param _p
 	 */
 	point(const point & _p);
 
 	/**
-	 *
+	 * \brief initialization constructor
 	 * @param _x
 	 * @param _y
 	 * @param _z
@@ -59,13 +62,20 @@ public:
 	point(double _x, double _y, double _z);
 
 	/**
-	 *
-	 * @return
+	 * \brief returns formatted string representation of this construct
+	 * @return a string
 	 */
 	std::string to_string() const;
 
+	/**
+	 * \brief stream operator using to_string method
+	 * @param out
+	 * @param p
+	 * @return reference to output stream
+	 */
 	friend std::ostream& operator<<(std::ostream &out, const point & p);
 
+	//member variables
 	double x;
 	double y;
 	double z;
