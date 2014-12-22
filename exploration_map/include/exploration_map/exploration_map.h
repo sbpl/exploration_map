@@ -29,10 +29,10 @@ namespace exploration
  */
 enum class exploration_type
 {
-	unknown /**value not known*/,
-	explored /**value is free and has also been seen by camera*/,
-	occupied /**value is an obstacles */,
-	unoccupied /**value is a free space */
+	unknown /**< value not known*/,
+	explored /**< <value is free and has also been seen by camera*/,
+	occupied /**< <value is an obstacles */,
+	unoccupied /**< <value is a free space */
 };
 
 /**
@@ -311,12 +311,12 @@ public:
 	}
 
 
-	double resolution; /** map resolution */
-	int size_x; /** length of map in cells */
-	int size_y; /** depth of map in cells */
-	int size_z; /** height of map in cells */
-	double ground_plane_height_threshold; /** specifies how high an obstacle has to be (metric wise) for it be considered and obstacle */
-	pose origin; /**specifies the origin of the map */
+	double resolution; /**< map resolution */
+	int size_x; /**< length of map in cells */
+	int size_y; /**< depth of map in cells */
+	int size_z; /**< height of map in cells */
+	double ground_plane_height_threshold; /**< specifies how high an obstacle has to be (metric wise) for it be considered and obstacle */
+	pose origin; /**< specifies the origin of the map */
 
 };
 
@@ -338,10 +338,10 @@ public:
 		unnoc_threshold = 0;
 	}
 
-	double lidar_update_increment_value; /** specifies how much a cell's value increases when scan votes that it is occupied */
-	double lidar_update_decrement_value; /** specifies how much a cell's value decrease when scan votes that it is clear */
-	double occ_threshold; /** specifies the min value for an occupied cell */
-	double unnoc_threshold; /** specifies the max value for a cleared cell */
+	double lidar_update_increment_value; /**< specifies how much a cell's value increases when scan votes that it is occupied */
+	double lidar_update_decrement_value; /**< specifies how much a cell's value decrease when scan votes that it is clear */
+	double occ_threshold; /**< specifies the min value for an occupied cell */
+	double unnoc_threshold; /**< specifies the max value for a cleared cell */
 };
 
 /**
@@ -349,9 +349,10 @@ public:
  */
 class exploration_map_config
 {
+
 public:
-	map_config map_config_;
-	occupancy_map_config occ_map_config_;
+	map_config map_config_; /**< map configuration */
+	occupancy_map_config occ_map_config_; /**< occupancy configuration */
 };
 
 /**
