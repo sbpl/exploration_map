@@ -24,3 +24,5 @@ install_manifest.txt
 */catkin_generated
 *screenshots/*
 *doc/*
+*html*
+*latex*
