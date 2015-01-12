@@ -4,4 +4,6 @@
 
 <include file="$(find utacc_multimaster)/launch/segbot_gateway.launch"/> 
 
+<node name="segbot_status_pub" pkg="rostopic" type="rostopic" args="pub -r 1 /segbot_status utacc_msgs/MissionStatus '{}' "/>
+
 </launch>
