@@ -8,4 +8,7 @@
 
 <node name="hexarotor_status_pub" pkg="rostopic" type="rostopic" args="pub -r 1 /hexa_status utacc_msgs/MissionStatus '{}' "/>
 
+<node name="fake_image_pub" pkg="occ" type="fake_image_pub" args="ooi_image_hexa"/>
+
+
 </launch>
