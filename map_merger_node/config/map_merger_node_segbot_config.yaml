@@ -17,7 +17,7 @@ robot_0_pose_name: /segbot_pose
 robot_1_pose_name: /segbot_pose
 
 #goal names
-goal_0_name: /next_goal
+goal_0_name: /goal
 goal_1_name: /hexa_goal_e2
 
 #goal list name
@@ -26,10 +26,10 @@ goal_list_name: /robot_goals
 #scan matching
 scan_match_ang_res: 0.05
 scan_match_met_res: 0.1
-scan_match_dx: 10
-scan_match_dy: 10
+scan_match_dx: 0
+scan_match_dy: 0
 scan_match_dz: 0
-scan_match_dyaw: 20
+scan_match_dyaw: 0
 
 #other 
 map_publish_rate: 1.0
