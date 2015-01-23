@@ -10,5 +10,8 @@
 
 <node name="relay4" pkg="topic_tools" type="relay" args="hexa_pose hexa_pose_e2"/>
 
+<node name="relay5" pkg="topic_tools" type="relay" args="segbot_goal segbot_goal_e2"/>
+
+<node name="relay6" pkg="topic_tools" type="relay" args="hexa_goal hexa_goal_e2"/>
 
 </launch>
