@@ -8,4 +8,6 @@
 
 <node name="fake_image_pub" pkg="occ" type="fake_image_pub" args="ooi_image_segbot"/>
 
+<node name="goal_relay" pkg="topic_tools" type="relay" args="segbot_goal_e2 goal"/>
+
 </launch>
