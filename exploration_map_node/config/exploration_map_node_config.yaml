@@ -21,7 +21,7 @@
   camera_pose_tf_name: /base_laser_link
   camera_scan_topic_name: /camera_scan_node/camera_scan
   robot_pose_tf_name: /base_footprint
-  robot_radius: 1.0
+  robot_radius: 0.5
   robot_height: 2.0
 
   #for hexarotor
