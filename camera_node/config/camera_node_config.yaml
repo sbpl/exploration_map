@@ -1,9 +1,9 @@
   frame: /map
   #for segway
-  image_topic_name: /segbot_cam/image_raw
+  image_topic_name: /segbot_cam/image_raw/compressed
   
   #for hexarotor
-  #image_topic_name: /hexa_cam/image_raw
+  #image_topic_name: /hexa_cam/image_raw/compressed
   
   sensor_field_of_view: 0.523
   senor_distance: 3.0
