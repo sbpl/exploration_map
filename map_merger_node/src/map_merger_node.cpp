@@ -396,6 +396,9 @@ void map_merger_node::publish_inner_maps()
 void map_merger_node::publish_robot_poses()
 {
 	nav_msgs::Path path_poses;
+	path_poses.header.frame_id = frame_name;
+	path_poses.header.seq = 0;
+	path_poses.header.stamp = ros::Time::now();
 	for (auto & p : robot_poses)
 	{
 		path_poses.poses.push_back(p);
