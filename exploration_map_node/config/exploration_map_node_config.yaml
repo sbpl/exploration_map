@@ -32,8 +32,8 @@
   #camera_pose_tf_name: /fixed_laser_frame
   #camera_scan_topic_name: /camera_scan_node/camera_scan
   #robot_pose_tf_name: /body_frame
-  #robot_radius: 2.0
-  #robot_height: 2.0
+  #robot_radius: 1.0
+  #robot_height: 0.5
 
   map_publish_rate: 2.0
   number_of_scans_to_skip: 5
