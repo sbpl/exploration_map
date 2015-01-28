@@ -26,7 +26,7 @@ void camera_scan_node::ros_configure()
 	ph.getParam("image_topic_name", image_topic_name);
 	ph.getParam("frame", frame_id);
 	ph.getParam("sensor_field_of_view", sensor_field_of_view_rad);
-	ph.getParam("senor_distance", sensor_distance);
+	ph.getParam("sensor_distance", sensor_distance);
 	ph.getParam("sensor_angular_res", sensor_angular_resolution);
 
 	camera_subscriber = nh.subscribe(image_topic_name, 1, &camera_scan_node::camera_image_callback, this);
