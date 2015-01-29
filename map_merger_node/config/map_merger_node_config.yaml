@@ -25,11 +25,11 @@ goal_list_name: /robot_goals
  
 #scan matching
 scan_match_ang_res: 0.05
-scan_match_met_res: 0.1
-scan_match_dx: 3
-scan_match_dy: 3
-scan_match_dz: 3
-scan_match_dyaw: 6
+scan_match_met_res: 0.05
+scan_match_dx: 5
+scan_match_dy: 5
+scan_match_dz: 0
+scan_match_dyaw: 8
 
 #other 
 map_publish_rate: 1.0

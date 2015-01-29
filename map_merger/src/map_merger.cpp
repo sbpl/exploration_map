@@ -144,11 +144,11 @@ int exploration::map_merger::update_map(const map_update& update, const pose& de
 
 	for (auto p : update.points)
 	{
-		//transform point to local frame
-		p = generic_transform::transform_position_to_frame(p, config_.map_config_.origin);
+        //transform point to destination frame
+        p = generic_transform::transform_position_to_frame(p, destination);
 
-		//transform point to map frame
-		p = generic_transform::transform_position_to_frame(p, destination);
+        //transform point to local frame
+        p = generic_transform::transform_position_to_frame(p, config_.map_config_.origin);
 
 		//discretize
 		cell current_cell;

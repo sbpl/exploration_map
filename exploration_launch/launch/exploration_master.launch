@@ -4,9 +4,13 @@
 
 <include file="$(find map_merger_node)/launch/map_merger_node.launch"/> 
 
-<include file="$(find explore3d)/launch/explore-3d.launch"/> 
+<include file="$(find utacc_exploration)/launch/utacc_exploration.launch"/> 
+
+
 
 <include file="$(find utacc_multimaster)/launch/epmm_gateway.launch"/> 
+
+<node name="move_to_area" pkg="utacc_exploration" type="move_to_area" />
 
 <node name="planner_status_pub" pkg="rostopic" type="rostopic" args="pub -r 1 /planner_status utacc_msgs/MissionStatus '{}' "/>
 
