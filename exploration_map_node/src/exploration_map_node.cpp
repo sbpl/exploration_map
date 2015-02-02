@@ -365,6 +365,8 @@ void exploration_map_node::convert_camera_scan_to_sensor_update_ray(const camera
 
 void exploration_map_node::map_publish_timer_callback(const ros::TimerEvent& event)
 {
+	//get latest pose
+	update_robot_pose(ros::Time(0));
 
 	//update map with respect to current pose
 	update_exploration_map_from_robot_pose(current_robot_pose);
