@@ -6,7 +6,7 @@
   map_size_x: 1200
   map_size_y: 700
   map_size_z: 50
-  ground_plane_height_threshold: 0.2
+  ground_plane_height_threshold: -1.0
   unnocupied_prob_threshold: 0.3
   occupancy_prob_threshold: 0.7
   lidar_update_increment: 1.0
