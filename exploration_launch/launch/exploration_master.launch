@@ -4,7 +4,7 @@
 
 <include file="$(find map_merger_node)/launch/map_merger_node.launch"/> 
 
-<include file="$(find explore3d)/launch/explore-3d.launch"/> 
+<include file="$(find utacc_exploration)/launch/utacc_exploration.launch"/> 
 
 <include file="$(find utacc_multimaster)/launch/epmm_gateway.launch"/> 
 

@@ -396,6 +396,9 @@ void map_merger_node::publish_inner_maps()
 void map_merger_node::publish_robot_poses()
 {
 	nav_msgs::Path path_poses;
+	path_poses.header.frame_id = frame_name;
+	path_poses.header.seq = 0;
+	path_poses.header.stamp = ros::Time::now();
 	for (auto & p : robot_poses)
 	{
 		path_poses.poses.push_back(p);
@@ -448,6 +451,8 @@ void map_merger_node::goal_list_callback(const nav_msgs::PathConstPtr& msg)
 		//transform pose according to its respective map merger origin
 		transform_pose_stamped_to_local_map_frame(p, origin);
 
+        for(size_t a = 0; a < 5; a++)
+        {
 		//publish goal
 		switch (i)
 		{
@@ -459,5 +464,9 @@ void map_merger_node::goal_list_callback(const nav_msgs::PathConstPtr& msg)
 		default:
 			break;
 		}
+
+        ros::Duration(1.0).sleep();
+
+        }
 	}
 }

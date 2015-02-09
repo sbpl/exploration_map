@@ -10,5 +10,8 @@
 
 <node name="fake_image_pub" pkg="occ" type="fake_image_pub" args="ooi_image_hexa"/>
 
+<node name="goal_relay" pkg="topic_tools" type="relay" args="hexa_goal_e2 goal"/>
+
+<node name="image_relay" pkg="image_transport" type="republish" args="compressed in:=hexa_cam/image_raw raw out:=hexa_cam"/>
 
 </launch>

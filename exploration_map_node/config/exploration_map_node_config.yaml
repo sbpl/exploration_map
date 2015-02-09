@@ -1,12 +1,12 @@
   frame: /map
   map_resolution: 0.1
-  map_origin_x: -35.025
-  map_origin_y: -5.025
+  map_origin_x: -1.025
+  map_origin_y: -12.025
   map_origin_z: 0.0
   map_size_x: 1200
   map_size_y: 700
   map_size_z: 50
-  ground_plane_height_threshold: 0.2
+  ground_plane_height_threshold: -1.0
   unnocupied_prob_threshold: 0.3
   occupancy_prob_threshold: 0.7
   lidar_update_increment: 1.0
@@ -32,8 +32,8 @@
   #camera_pose_tf_name: /fixed_laser_frame
   #camera_scan_topic_name: /camera_scan_node/camera_scan
   #robot_pose_tf_name: /body_frame
-  #robot_radius: 2.0
-  #robot_height: 2.0
+  #robot_radius: 1.0
+  #robot_height: 0.5
 
   map_publish_rate: 2.0
   number_of_scans_to_skip: 5
