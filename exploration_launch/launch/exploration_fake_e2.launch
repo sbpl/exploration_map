@@ -14,4 +14,10 @@
 
 <node name="relay6" pkg="topic_tools" type="relay" args="hexa_goal hexa_goal_e2"/>
 
+<node name="relay7" pkg="topic_tools" type="relay" args="OI_async_info E2_async_info"/>
+
+<node name="relay8" pkg="topic_tools" type="relay" args="segbot_status segbot_status_e2"/>
+
+<node name="relay9" pkg="topic_tools" type="relay" args="segbot_status hexa_status_e2"/>
+
 </launch>
