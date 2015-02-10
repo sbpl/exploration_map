@@ -49,6 +49,7 @@ void map_merger_node::setup_ros()
 	ph.getParam("scan_match_dyaw", scan_match_dyaw);
         ph.getParam("goal_0_name", goal_0_name);
         ph.getParam("goal_1_name", goal_1_name);
+    ph.param("publish_inner_maps", m_publish_inner_maps, false);
 
 	ROS_INFO("frame %s\n", frame_name.c_str());
 	ROS_INFO("map_resolution %f\n", map_resolution);
@@ -92,7 +93,10 @@ void map_merger_node::map_publish_callback(const ros::TimerEvent& event)
 {
 
 	//publish map 0 and 1 for debugging purposes
-	//	publish_inner_maps();
+    if (m_publish_inner_maps)
+    {
+	    this->publish_inner_maps();
+    }
 
 	if (merger.origins_are_initialized())
 	{
