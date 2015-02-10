@@ -455,6 +455,8 @@ void map_merger_node::goal_list_callback(const nav_msgs::PathConstPtr& msg)
 		//transform pose according to its respective map merger origin
 		transform_pose_stamped_to_local_map_frame(p, origin);
 
+        for(size_t a = 0; a < 5; a++)
+        {
 		//publish goal
 		switch (i)
 		{
@@ -466,5 +468,9 @@ void map_merger_node::goal_list_callback(const nav_msgs::PathConstPtr& msg)
 		default:
 			break;
 		}
+
+        ros::Duration(1.0).sleep();
+
+        }
 	}
 }
