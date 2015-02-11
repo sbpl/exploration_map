@@ -102,6 +102,8 @@ private:
         std::string goal_0_name;
         std::string goal_1_name;
 
+    bool m_publish_inner_maps;
+
 	//ros node handlers
 	ros::NodeHandle nh;
 	ros::NodeHandle ph;
