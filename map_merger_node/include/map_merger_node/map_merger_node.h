@@ -23,7 +23,6 @@
 #include <algorithm>
 #include <map_merger/map_merger.h>
 
-
 class map_merger_node
 {
 
@@ -74,7 +73,6 @@ private:
 
 	void transform_pose_stamped_with_origin(geometry_msgs::PoseStamped & pose, const exploration::pose * origin, bool inverse);
 
-
 	void goal_list_callback(const nav_msgs::PathConstPtr & msg);
 
 	//config variables
@@ -86,7 +84,7 @@ private:
 	int map_size_x;
 	int map_size_y;
 	int map_size_z;
-	int number_of_maps ;
+	int number_of_maps;
 	double map_publish_rate;
 	std::string robot_0_map_name;
 	std::string robot_1_map_name;
@@ -99,10 +97,10 @@ private:
 	int scan_match_dy;
 	int scan_match_dz;
 	int scan_match_dyaw;
-        std::string goal_0_name;
-        std::string goal_1_name;
+	std::string goal_0_name;
+	std::string goal_1_name;
 
-    bool m_publish_inner_maps;
+	bool m_publish_inner_maps;
 
 	//ros node handlers
 	ros::NodeHandle nh;
@@ -139,5 +137,4 @@ private:
 };
 
 #endif /* MAP_MERGER_NODE_H_ */
-
 
