@@ -2,5 +2,7 @@
 
 <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch"/> 
 
+<include file="$(find utacc_multimaster)/launch/occ_gateway.launch"/>
+
 </launch>
 
