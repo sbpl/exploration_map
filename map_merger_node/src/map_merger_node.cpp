@@ -47,8 +47,9 @@ void map_merger_node::setup_ros()
 	ph.getParam("scan_match_dy", scan_match_dy);
 	ph.getParam("scan_match_dz", scan_match_dz);
 	ph.getParam("scan_match_dyaw", scan_match_dyaw);
-        ph.getParam("goal_0_name", goal_0_name);
-        ph.getParam("goal_1_name", goal_1_name);
+	ph.getParam("goal_0_name", goal_0_name);
+	ph.getParam("goal_1_name", goal_1_name);
+	ph.param("publish_inner_maps", m_publish_inner_maps, false);
 
 	ROS_INFO("frame %s\n", frame_name.c_str());
 	ROS_INFO("map_resolution %f\n", map_resolution);
@@ -92,7 +93,10 @@ void map_merger_node::map_publish_callback(const ros::TimerEvent& event)
 {
 
 	//publish map 0 and 1 for debugging purposes
-	//	publish_inner_maps();
+	if (m_publish_inner_maps)
+	{
+		this->publish_inner_maps();
+	}
 
 	if (merger.origins_are_initialized())
 	{
@@ -116,7 +120,7 @@ void map_merger_node::robot_0_map_callback(const pcl::PointCloud<pcl::PointXYZI>
 	ROS_INFO("got map 0 with seq number %d", map_0_point_cloud.header.seq);
 	if (exp_seq != 0 and exp_seq != map_0_point_cloud.header.seq)
 	{
-		ROS_ERROR("sequence number for map 0 does not match expected (%d vs %d)",map_0_point_cloud.header.seq, exp_seq);
+		ROS_ERROR("sequence number for map 0 does not match expected (%d vs %d)", map_0_point_cloud.header.seq, exp_seq);
 	}
 	exp_seq = map_0_point_cloud.header.seq + 1;
 
@@ -138,7 +142,7 @@ void map_merger_node::robot_1_map_callback(const pcl::PointCloud<pcl::PointXYZI>
 	ROS_INFO("got map 1 with seq number %d", map_1_point_cloud.header.seq);
 	if (exp_seq != 0 and exp_seq != map_1_point_cloud.header.seq)
 	{
-		ROS_ERROR("sequence number for map 1 does not match expected (%d vs %d)",map_1_point_cloud.header.seq, exp_seq);
+		ROS_ERROR("sequence number for map 1 does not match expected (%d vs %d)", map_1_point_cloud.header.seq, exp_seq);
 	}
 	exp_seq = map_1_point_cloud.header.seq + 1;
 
@@ -413,7 +417,7 @@ void map_merger_node::transform_pose_stamped_with_origin(geometry_msgs::PoseStam
 	tf::Quaternion oq(origin->ori.x, origin->ori.y, origin->ori.z, origin->ori.w);
 	tf::Vector3 ov(origin->pos.x, origin->pos.y, origin->pos.z);
 	tf::Transform trans(oq, ov);
-	if(inverse)
+	if (inverse)
 	{
 		trans = trans.inverse();
 	}
@@ -425,12 +429,12 @@ void map_merger_node::transform_pose_stamped_with_origin(geometry_msgs::PoseStam
 
 void map_merger_node::transform_pose_stamped_to_master_map_frame(geometry_msgs::PoseStamped& pose, const exploration::pose* origin)
 {
-	transform_pose_stamped_with_origin(pose,origin,false);
+	transform_pose_stamped_with_origin(pose, origin, false);
 }
 
 void map_merger_node::transform_pose_stamped_to_local_map_frame(geometry_msgs::PoseStamped& pose, const exploration::pose* origin)
 {
-	transform_pose_stamped_with_origin(pose,origin,true);
+	transform_pose_stamped_with_origin(pose, origin, true);
 }
 
 void map_merger_node::goal_list_callback(const nav_msgs::PathConstPtr& msg)
@@ -451,22 +455,22 @@ void map_merger_node::goal_list_callback(const nav_msgs::PathConstPtr& msg)
 		//transform pose according to its respective map merger origin
 		transform_pose_stamped_to_local_map_frame(p, origin);
 
-        for(size_t a = 0; a < 5; a++)
-        {
-		//publish goal
-		switch (i)
+		for (size_t a = 0; a < 5; a++)
 		{
-		case 0:
-			publish_pose(p, robot_0_goal_publisher);
-			break;
-		case 1:
-			publish_pose(p, robot_1_goal_publisher);
-		default:
-			break;
+			//publish goal
+			switch (i)
+			{
+			case 0:
+				publish_pose(p, robot_0_goal_publisher);
+				break;
+			case 1:
+				publish_pose(p, robot_1_goal_publisher);
+			default:
+				break;
+			}
+
+			ros::Duration(1.0).sleep();
+
 		}
-
-        ros::Duration(1.0).sleep();
-
-        }
 	}
 }

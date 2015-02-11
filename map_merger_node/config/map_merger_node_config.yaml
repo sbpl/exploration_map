@@ -33,4 +33,6 @@ scan_match_dyaw: 8
 
 #other 
 map_publish_rate: 1.0
- 
+
+# debug
+publish_inner_maps: false
