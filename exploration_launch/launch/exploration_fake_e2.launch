@@ -2,6 +2,8 @@
 
 <include file="$(find utacc_multimaster)/launch/e2_gateway.launch"/>
 
+<include file="$(find utacc_exploration)/launch/e2_simulator.launch"/>
+
 <node name="relay1" pkg="topic_tools" type="relay" args="segbot_map segbot_map_e2"/>
 
 <node name="relay2" pkg="topic_tools" type="relay" args="segbot_pose segbot_pose_e2"/>
@@ -18,6 +20,10 @@
 
 <node name="relay8" pkg="topic_tools" type="relay" args="segbot_status segbot_status_e2"/>
 
-<node name="relay9" pkg="topic_tools" type="relay" args="segbot_status hexa_status_e2"/>
+<node name="relay9" pkg="topic_tools" type="relay" args="hexa_status hexa_status_e2"/>
+
+<node name="relay10" pkg="topic_tools" type="relay" args="ooi_image_segbot ooi_image_segbot_e2"/>
+
+<node name="relay11" pkg="topic_tools" type="relay" args="ooi_image_hexa ooi_image_hexa_e2"/>
 
 </launch>
