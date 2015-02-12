@@ -8,9 +8,7 @@
 
 <include file="$(find utacc_exploration)/launch/hexa_exploration_executive.launch"/>
 
-<include file="$(find ooi_detection)/launch/hexarotor_detection.launch"/>
-
-<node name="fake_image_pub" pkg="occ" type="fake_image_pub" args="ooi_image_hexa"/>
+<include file="$(find ooi_detection)/launch/hexa_detection.launch"/>
 
 <node name="goal_relay" pkg="topic_tools" type="relay" args="hexa_goal_e2 goal_pose"/>
 
