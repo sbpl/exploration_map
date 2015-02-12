@@ -8,7 +8,7 @@
 
 <include file="$(find ooi_detection)/launch/segbot_detection.launch"/>
 
-<node name="goal_relay" pkg="topic_tools" type="relay" args="segbot_goal_e2 goal"/>
+<node name="goal_relay" pkg="topic_tools" type="relay" args="segbot_active_goal goal"/>
 
 <node name="image_relay" pkg="image_transport" type="republish" args="compressed in:=segbot_cam/image_raw raw out:=segbot_cam"/>
 
