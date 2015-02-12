@@ -10,7 +10,7 @@
 
 <include file="$(find ooi_detection)/launch/hexa_detection.launch"/>
 
-<node name="goal_relay" pkg="topic_tools" type="relay" args="hexa_goal_e2 goal_pose"/>
+<node name="goal_relay" pkg="topic_tools" type="relay" args="hexa_active_goal goal_pose"/>
 
 <node name="image_relay" pkg="image_transport" type="republish" args="compressed in:=hexa_cam/image_raw raw out:=hexa_cam"/>
 
