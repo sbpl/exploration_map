@@ -12,4 +12,6 @@
 
 <node name="image_relay" pkg="image_transport" type="republish" args="compressed in:=segbot_cam/image_raw raw out:=segbot_cam"/>
 
+<node name="voltage_monitor" pkg="voltage_monitor" type="voltage_monitor" />
+
 </launch>

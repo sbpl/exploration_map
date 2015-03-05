@@ -6,11 +6,11 @@
   map_size_x: 1200
   map_size_y: 700
   map_size_z: 50
-  ground_plane_height_threshold: -1.0
-  unnocupied_prob_threshold: 0.3
-  occupancy_prob_threshold: 0.7
-  lidar_update_increment: 1.0
-  lidar_update_decrement: 0.1
+  ground_plane_height_threshold: -3.0
+  unnocupied_prob_threshold: 0.4
+  occupancy_prob_threshold: 0.6
+  lidar_update_increment: 0.2
+  lidar_update_decrement: 0.05
   min_sensor_distance_threshold: 0.6
 
   #for segbot
@@ -36,5 +36,5 @@
   #robot_height: 0.5
 
   map_publish_rate: 2.0
-  number_of_scans_to_skip: 5
+  number_of_scans_to_skip: 0
   publish_debug_messages: false
