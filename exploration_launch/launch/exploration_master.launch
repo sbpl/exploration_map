@@ -8,8 +8,6 @@
 
 <include file="$(find utacc_multimaster)/launch/epmm_gateway.launch"/> 
 
-<node name="planner_status_pub" pkg="rostopic" type="rostopic" args="pub -r 1 /planner_status utacc_msgs/MissionStatus '{}' "/>
-
 <node name="rosbag_record" pkg="rosbag" type="record" args="-o /home/utacc/Bag/exploration_master -a"/>
 
 </launch>
