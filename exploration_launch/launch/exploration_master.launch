@@ -1,13 +1,8 @@
 <launch>
+    <include file="$(find utacc_multimaster)/launch/utacc_hub.launch"/>
+    <include file="$(find map_merger_node)/launch/map_merger_node.launch"/> 
+    <include file="$(find utacc_exploration)/launch/utacc_exploration.launch"/> 
+    <include file="$(find utacc_multimaster)/launch/epmm_gateway.launch"/> 
 
-<include file="$(find utacc_multimaster)/launch/utacc_hub.launch"/>
-
-<include file="$(find map_merger_node)/launch/map_merger_node.launch"/> 
-
-<include file="$(find utacc_exploration)/launch/utacc_exploration.launch"/> 
-
-<include file="$(find utacc_multimaster)/launch/epmm_gateway.launch"/> 
-
-<node name="rosbag_record" pkg="rosbag" type="record" args="-o /home/utacc/Bag/exploration_master -a"/>
-
+    <node name="rosbag_record" pkg="rosbag" type="record" args="-o /home/utacc/Bag/exploration_master -a"/>
 </launch>

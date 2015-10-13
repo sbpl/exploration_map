@@ -6,6 +6,7 @@
  */
 
 #include <map_merger_node/map_merger_node.h>
+#include <pcl_conversions/pcl_conversions.h>
 
 map_merger_node::map_merger_node() :
 		nh(), ph("~")
@@ -175,7 +176,7 @@ void map_merger_node::publish_point_cloud(const std::vector<pcl::PointXYZI> & po
 	cloud.height = 1;
 	cloud.width = cloud.points.size();
 	cloud.header.frame_id = frame_name;
-	cloud.header.stamp = ros::Time::now();
+	cloud.header.stamp = pcl_conversions::toPCL(ros::Time::now());
 	pub.publish(cloud);
 }
 

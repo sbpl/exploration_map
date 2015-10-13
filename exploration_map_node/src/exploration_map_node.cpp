@@ -6,6 +6,7 @@
  */
 
 #include <exploration_map_node/exploration_map_node.h>
+#include <pcl_conversions/pcl_conversions.h>
 
 exploration_map_node::exploration_map_node() :
 		n(), pn("~")
@@ -212,8 +213,12 @@ void exploration_map_node::publish_point_cloud(const std::vector<pcl::PointXYZI>
 	std::copy(points.begin(), points.end(), cloud.points.begin());
 	cloud.height = 1;
 	cloud.width = cloud.points.size();
-	cloud.header.frame_id = frame_name;
-	cloud.header.stamp = ros::Time::now();
+
+    std_msgs::Header header;
+    header.frame_id = frame_name;
+    header.seq = 0;
+    header.stamp = ros::Time::now();
+    cloud.header = pcl_conversions::toPCL(header);
 	pub.publish(cloud);
 }
 

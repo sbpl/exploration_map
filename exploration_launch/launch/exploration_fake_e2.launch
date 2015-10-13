@@ -1,29 +1,16 @@
 <launch>
+    <include file="$(find utacc_multimaster)/launch/e2_gateway.launch"/>
+    <include file="$(find utacc_exploration)/launch/e2_simulator.launch"/>
 
-<include file="$(find utacc_multimaster)/launch/e2_gateway.launch"/>
-
-<include file="$(find utacc_exploration)/launch/e2_simulator.launch"/>
-
-<node name="relay1" pkg="topic_tools" type="relay" args="segbot_map segbot_map_e2"/>
-
-<node name="relay2" pkg="topic_tools" type="relay" args="segbot_pose segbot_pose_e2"/>
-
-<node name="relay3" pkg="topic_tools" type="relay" args="hexa_map hexa_map_e2"/>
-
-<node name="relay4" pkg="topic_tools" type="relay" args="hexa_pose hexa_pose_e2"/>
-
-<node name="relay5" pkg="topic_tools" type="relay" args="segbot_goal segbot_goal_e2"/>
-
-<node name="relay6" pkg="topic_tools" type="relay" args="hexa_goal hexa_goal_e2"/>
-
-<node name="relay7" pkg="topic_tools" type="relay" args="OI_async_info E2_async_info"/>
-
-<node name="relay8" pkg="topic_tools" type="relay" args="segbot_status segbot_status_e2"/>
-
-<node name="relay9" pkg="topic_tools" type="relay" args="hexa_status hexa_status_e2"/>
-
-<node name="relay10" pkg="topic_tools" type="relay" args="ooi_image_segbot ooi_image_segbot_e2"/>
-
-<node name="relay11" pkg="topic_tools" type="relay" args="ooi_image_hexa ooi_image_hexa_e2"/>
-
+    <node name="relay1" pkg="topic_tools" type="relay" args="segbot_map segbot_map_e2"/>
+    <node name="relay2" pkg="topic_tools" type="relay" args="segbot_pose segbot_pose_e2"/>
+    <node name="relay3" pkg="topic_tools" type="relay" args="hexa_map hexa_map_e2"/>
+    <node name="relay4" pkg="topic_tools" type="relay" args="hexa_pose hexa_pose_e2"/>
+    <node name="relay5" pkg="topic_tools" type="relay" args="segbot_goal segbot_goal_e2"/>
+    <node name="relay6" pkg="topic_tools" type="relay" args="hexa_goal hexa_goal_e2"/>
+    <node name="relay7" pkg="topic_tools" type="relay" args="OI_async_info E2_async_info"/>
+    <node name="relay8" pkg="topic_tools" type="relay" args="segbot_status segbot_status_e2"/>
+    <node name="relay9" pkg="topic_tools" type="relay" args="hexa_status hexa_status_e2"/>
+    <node name="relay10" pkg="topic_tools" type="relay" args="ooi_image_segbot ooi_image_segbot_e2"/>
+    <node name="relay11" pkg="topic_tools" type="relay" args="ooi_image_hexa ooi_image_hexa_e2"/>
 </launch>

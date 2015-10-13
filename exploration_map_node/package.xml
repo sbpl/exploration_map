@@ -1,0 +1,21 @@
+<package format="2">
+    <name>exploration_map_node</name>
+    <version>0.0.0</version>
+    <description>exploration_map_node</description>
+    <maintainer email="andrew.dornbush@gmail.com">Andrew Dornbush</maintainer>
+    <author>Brian MacAllister</author>
+    <license>TODO</license>
+
+    <buildtool_depend>catkin</buildtool_depend>
+
+    <depend>camera_node</depend>
+    <depend>exploration_map</depend>
+    <depend>geometry_msgs</depend>
+    <depend>pcl_ros</depend>
+    <depend>roscpp</depend>
+    <depend>rospy</depend>
+    <depend>sensor_msgs</depend>
+    <depend>sensor_update</depend>
+    <depend>std_msgs</depend>
+    <depend>tf</depend>
+</package>
