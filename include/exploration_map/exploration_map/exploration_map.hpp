@@ -8,7 +8,7 @@
 #ifndef EXPLORATION_MAP_HPP_
 #define EXPLORATION_MAP_HPP_
 
-#include <exploration_map/exploration_map.h>
+#include <exploration_map/exploration_map/exploration_map.h>
 
 using namespace exploration;
 

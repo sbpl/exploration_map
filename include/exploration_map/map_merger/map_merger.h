@@ -9,8 +9,8 @@
 #include <iostream>
 #include <string>
 
-#include <exploration_map/exploration_map.h>
-#include <exploration_map/exploration_map.hpp>
+#include <exploration_map/exploration_map/exploration_map.h>
+#include <exploration_map/exploration_map/exploration_map.hpp>
 #include <exploration_map/generic_transform/generic_transform.h>
 
 #ifndef MAP_MERGER_H_

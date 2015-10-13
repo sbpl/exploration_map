@@ -5,7 +5,7 @@
  *      Author: bmacallister
  */
 
-#include <exploration_map/exploration_map.h>
+#include <exploration_map/exploration_map/exploration_map.h>
 
 using namespace exploration;
 

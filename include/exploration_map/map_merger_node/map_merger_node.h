@@ -22,7 +22,7 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <tf/transform_listener.h>
 
-#include <exploration_map/exploration_map.h>
+#include <exploration_map/exploration_map/exploration_map.h>
 #include <exploration_map/map_merger/map_merger.h>
 
 class map_merger_node

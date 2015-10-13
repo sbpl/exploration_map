@@ -12,7 +12,6 @@
 #include <iostream>
 #include <string>
 
-#include <exploration_map/exploration_map.h>
 #include <geometry_msgs/Point.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <pcl/point_types.h>
@@ -24,6 +23,7 @@
 #include <tf/transform_listener.h>
 
 #include <exploration_map/camera_scan.h>
+#include <exploration_map/exploration_map/exploration_map.h>
 #include <exploration_map/sensor_update/sensor_update.h>
 
 /**

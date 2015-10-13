@@ -5,8 +5,8 @@
  *      Author: bmacallister
  */
 
-#include <exploration_map/exploration_map.h>
-#include <exploration_map/exploration_map.hpp>
+#include <exploration_map/exploration_map/exploration_map.h>
+#include <exploration_map/exploration_map/exploration_map.hpp>
 
 template class generic_map<exploration_type> ;
 template class generic_map<int> ;
