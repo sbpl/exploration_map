@@ -1,0 +1,10 @@
+<package>
+    <name>generic_transform</name>
+    <version>0.0.0</version>
+    <description>generic_transform</description>
+    <maintainer email="andrew.dornbush@gmail.com">Andrew Dornbush</maintainer>
+    <author>Brian MacAllister</author>
+    <license>TODO</license>
+
+    <buildtool_depend>catkin</buildtool_depend>
+</package>
