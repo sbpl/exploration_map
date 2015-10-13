@@ -8,15 +8,15 @@
 #ifndef EXPLORATION_MAP_H_
 #define EXPLORATION_MAP_H_
 
-#include <vector>
-#include <string>
-#include <iostream>
 #include <algorithm>
-#include <sensor_update/sensor_update.h>
-#include <generic_transform/generic_transform.h>
-#include <algorithm>
-#include <sstream>
 #include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <vector>
+
+#include <exploration_map/generic_transform/generic_transform.h>
+#include <exploration_map/sensor_update/sensor_update.h>
 
 /**
  * \brief namespace for exploration map stuff

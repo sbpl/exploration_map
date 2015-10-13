@@ -8,21 +8,23 @@
 #ifndef EXPLORATION_MAP_NODE_H_
 #define EXPLORATION_MAP_NODE_H_
 
+#include <algorithm>
 #include <iostream>
 #include <string>
-#include <ros/ros.h>
-#include "ros/time.h"
+
+#include <exploration_map/exploration_map.h>
 #include <geometry_msgs/Point.h>
 #include <geometry_msgs/PoseStamped.h>
-#include <sensor_msgs/LaserScan.h>
-#include <sensor_update/sensor_update.h>
-#include <exploration_map/exploration_map.h>
-#include <pcl_ros/point_cloud.h>
 #include <pcl/point_types.h>
+#include <pcl_ros/point_cloud.h>
+#include <ros/ros.h>
+#include <ros/time.h>
+#include <sensor_msgs/LaserScan.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <tf/transform_listener.h>
-#include <algorithm>
-#include <camera_node/camera_scan.h>
+
+#include <exploration_map/camera_scan.h>
+#include <exploration_map/sensor_update/sensor_update.h>
 
 /**
  * Interface between ros environment and exploration map
@@ -56,7 +58,7 @@ private:
 
 	void vertical_lidar_callback(const sensor_msgs::LaserScanConstPtr & msg);
 
-	void camera_scan_callback(const camera_node::camera_scanConstPtr & msg);
+	void camera_scan_callback(const exploration_map::camera_scanConstPtr & msg);
 
 	void map_publish_timer_callback(const ros::TimerEvent & event);
 
@@ -64,7 +66,7 @@ private:
 
 	void convert_laser_scan_to_sensor_update_ray(const sensor_msgs::LaserScan & scan, sensor_update::sensor_reading & reading);
 
-	void convert_camera_scan_to_sensor_update_ray(const camera_node::camera_scan & scan, sensor_update::sensor_reading & reading);
+	void convert_camera_scan_to_sensor_update_ray(const exploration_map::camera_scan & scan, sensor_update::sensor_reading & reading);
 
 	void publish_sensor_update(const sensor_update::sensor_update & update, const ros::Publisher & pub);
 

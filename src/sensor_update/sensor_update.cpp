@@ -5,7 +5,7 @@
  *      Author: bmacallister
  */
 
-#include <sensor_update/sensor_update.h>
+#include <exploration_map/sensor_update/sensor_update.h>
 
 namespace sensor_update
 {

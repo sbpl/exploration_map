@@ -8,11 +8,13 @@
 #ifndef CAMERA_NODE_H_
 #define CAMERA_NODE_H_
 
-#include <string>
 #include <iostream>
+#include <string>
+
 #include <ros/ros.h>
-#include <camera_node/camera_scan.h>
 #include <sensor_msgs/Image.h>
+
+#include <exploration_map/camera_scan.h>
 
 /**
  * \brief ros node for retrieving camera images and publishing corresponding camera scans
@@ -52,7 +54,7 @@ private:
 	 * \brief publishes the camera scan with same timestamp as it coresponding image
 	 * @param scan the camera scan
 	 */
-	void publish_camera_scan(const camera_node::camera_scan & scan);
+	void publish_camera_scan(const exploration_map::camera_scan & scan);
 
 	//ros related
 	ros::NodeHandle nh;

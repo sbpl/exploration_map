@@ -5,12 +5,13 @@
  *      Author: bmacallister
  */
 
-#include <string>
-#include <iostream>
 #include <algorithm>
+#include <iostream>
+#include <string>
+
 #include <exploration_map/exploration_map.h>
 #include <exploration_map/exploration_map.hpp>
-#include <generic_transform/generic_transform.h>
+#include <exploration_map/generic_transform/generic_transform.h>
 
 #ifndef MAP_MERGER_H_
 #define MAP_MERGER_H_

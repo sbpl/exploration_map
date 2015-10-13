@@ -1,0 +1,2 @@
+add_executable(map_merger_node map_merger_node.cpp)
+target_link_libraries(map_merger_node ${catkin_LIBRARIES} map_merger exploration_map)

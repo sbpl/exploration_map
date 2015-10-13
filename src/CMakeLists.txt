@@ -1,0 +1,6 @@
+add_subdirectory(sensor_update)
+add_subdirectory(camera_node)
+add_subdirectory(exploration_map)
+add_subdirectory(exploration_map_node)
+add_subdirectory(map_merger)
+add_subdirectory(map_merger_node)

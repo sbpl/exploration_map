@@ -1,11 +1,6 @@
 <launch>
-
-<node pkg="map_merger_node" type="map_merger_node" respawn="false" name="map_merger_node" output="screen"   >
-
-<rosparam file = "$(find map_merger_node)/config/map_merger_node_segbot_config.yaml" command="load"  />
-<rosparam file = "$(find utacc_exploration)/config/exploration_common.yaml" command="load" />
-
-
-</node>
-
+    <node pkg="exploration_map" type="map_merger_node" respawn="false" name="map_merger_node" output="screen">
+        <rosparam file = "$(find exploration_map)/config/map_merger_node/map_merger_node_segbot_config.yaml" command="load"/>
+        <rosparam file = "$(find utacc_exploration)/config/exploration_common.yaml" command="load"/>
+    </node>
 </launch>

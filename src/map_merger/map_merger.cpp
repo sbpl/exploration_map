@@ -5,7 +5,7 @@
  *      Author: bmacallister
  */
 
-#include <map_merger/map_merger.h>
+#include <exploration_map/map_merger/map_merger.h>
 
 exploration::map_merger::map_merger()
 {

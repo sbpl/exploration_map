@@ -5,7 +5,8 @@
  *      Author: bmacallister
  */
 
-#include <map_merger_node/map_merger_node.h>
+#include <exploration_map/map_merger_node/map_merger_node.h>
+ 
 #include <pcl_conversions/pcl_conversions.h>
 
 map_merger_node::map_merger_node() :

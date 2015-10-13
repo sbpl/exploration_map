@@ -1,6 +1,6 @@
 <launch>
     <include file="$(find uav_launch)/launch/uav_launch.launch"/>
-    <include file="$(find exploration_map_node)/launch/exploration_map_node-hexa.launch"/> 
+    <include file="$(find exploration_map)/launch/exploration_map_node-hexa.launch"/> 
     <include file="$(find utacc_multimaster)/launch/hexa_gateway.launch"/> 
     <include file="$(find utacc_exploration)/launch/hexa_exploration_executive.launch"/>
     <include file="$(find ooi_detection)/launch/hexa_detection.launch"/>

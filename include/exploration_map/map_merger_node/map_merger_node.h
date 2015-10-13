@@ -8,20 +8,22 @@
 #ifndef MAP_MERGER_NODE_H_
 #define MAP_MERGER_NODE_H_
 
+#include <algorithm>
 #include <iostream>
 #include <string>
-#include <ros/ros.h>
-#include "ros/time.h"
-#include <nav_msgs/Path.h>
+
 #include <geometry_msgs/Point.h>
 #include <geometry_msgs/PoseStamped.h>
-#include <exploration_map/exploration_map.h>
-#include <pcl_ros/point_cloud.h>
+#include <nav_msgs/Path.h>
 #include <pcl/point_types.h>
+#include <pcl_ros/point_cloud.h>
+#include <ros/ros.h>
+#include <ros/time.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <tf/transform_listener.h>
-#include <algorithm>
-#include <map_merger/map_merger.h>
+
+#include <exploration_map/exploration_map.h>
+#include <exploration_map/map_merger/map_merger.h>
 
 class map_merger_node
 {

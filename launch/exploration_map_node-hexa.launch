@@ -1,15 +1,12 @@
 <launch>
+    <node pkg="exploration_map" type="exploration_map_node" respawn="false" name="exploration_map_node" output="screen">
+        <rosparam file = "$(find exploration)/config/exploration_map_node/exploration_map_node_config.yaml" command="load"/>
+        <rosparam file = "$(find utacc_exploration)/config/exploration_common.yaml" command="load"/>
+        <remap from="/exploration_map_node/exploration_map" to="hexa_map"/>
+        <remap from="/exploration_map_node/robot_pose" to="hexa_pose"/>
+    </node>
 
-<node pkg="exploration_map_node" type="exploration_map_node" respawn="false" name="exploration_map_node" output="screen"   >
-
-<rosparam file = "$(find exploration_map_node)/config/exploration_map_node_config.yaml" command="load"  />
-<rosparam file = "$(find utacc_exploration)/config/exploration_common.yaml" command="load" />
-<remap from="/exploration_map_node/exploration_map" to="hexa_map"/>
-<remap from="/exploration_map_node/robot_pose" to="hexa_pose"/>
-</node>
-
-<node pkg="camera_node" type="camera_node" respawn="false" name="camera_scan_node"  >
-<rosparam file = "$(find camera_node)/config/camera_node_config.yaml" command="load"  />
-</node>
-
+    <node pkg="exploration_map" type="camera_node" respawn="false" name="camera_scan_node">
+        <rosparam file = "$(find exploration_map)/config/camera_node/camera_node_config.yaml" command="load"/>
+    </node>
 </launch>

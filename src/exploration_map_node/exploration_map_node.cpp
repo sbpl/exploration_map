@@ -5,7 +5,8 @@
  *      Author: bmacallister
  */
 
-#include <exploration_map_node/exploration_map_node.h>
+#include <exploration_map/exploration_map_node/exploration_map_node.h>
+
 #include <pcl_conversions/pcl_conversions.h>
 
 exploration_map_node::exploration_map_node() :
@@ -285,7 +286,7 @@ bool exploration_map_node::update_exploration_map(const sensor_update::sensor_up
 	return true;
 }
 
-void exploration_map_node::camera_scan_callback(const camera_node::camera_scanConstPtr& msg)
+void exploration_map_node::camera_scan_callback(const exploration_map::camera_scanConstPtr& msg)
 {
 	//skip scan if required
 	if (camera_scan_counter < number_of_scans_to_skip)
@@ -310,7 +311,7 @@ void exploration_map_node::camera_scan_callback(const camera_node::camera_scanCo
 	sensor_update::pose sense_pose;
 	sensor_update::sensor_reading reading;
 	convert_pose_to_sensor_update_pose(camera_pose, sense_pose);
-	camera_node::camera_scan scan = *msg;
+	exploration_map::camera_scan scan = *msg;
 	convert_camera_scan_to_sensor_update_ray(scan, reading);
 	sensor_update::camera_update update(sense_pose, reading);
 
@@ -330,7 +331,7 @@ void exploration_map_node::camera_scan_callback(const camera_node::camera_scanCo
 	update_exploration_map(update);
 }
 
-void exploration_map_node::convert_camera_scan_to_sensor_update_ray(const camera_node::camera_scan& scan, sensor_update::sensor_reading& reading)
+void exploration_map_node::convert_camera_scan_to_sensor_update_ray(const exploration_map::camera_scan& scan, sensor_update::sensor_reading& reading)
 {
 	float range_min = scan.range_min;
 	float range_max = scan.range_max;

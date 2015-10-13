@@ -6,7 +6,7 @@
  *      Author: bmacallister
  */
 
-#include <camera_node/camera_node.h>
+#include <exploration_map/camera_node/camera_node.h>
 
 camera_scan_node::camera_scan_node():ph("~")
 {
@@ -30,7 +30,7 @@ void camera_scan_node::ros_configure()
 	ph.getParam("sensor_angular_res", sensor_angular_resolution);
 
 	camera_subscriber = nh.subscribe(image_topic_name, 1, &camera_scan_node::camera_image_callback, this);
-	camera_scan_publisher = ph.advertise<camera_node::camera_scan>("camera_scan",1);
+	camera_scan_publisher = ph.advertise<exploration_map::camera_scan>("camera_scan",1);
 
 }
 
@@ -40,7 +40,7 @@ void camera_scan_node::camera_image_callback(const sensor_msgs::ImageConstPtr ms
 	sensor_msgs::Image im = *msg;
 
 	//generate camera scan with image
-	camera_node::camera_scan cam_scan;
+	exploration_map::camera_scan cam_scan;
 	cam_scan.header = im.header;
 	cam_scan.image_data = im;
 	cam_scan.yaw_angle_increment = sensor_angular_resolution;
@@ -76,7 +76,7 @@ void camera_scan_node::camera_image_callback(const sensor_msgs::ImageConstPtr ms
 	publish_camera_scan(cam_scan);
 }
 
-void camera_scan_node::publish_camera_scan(const camera_node::camera_scan& scan)
+void camera_scan_node::publish_camera_scan(const exploration_map::camera_scan& scan)
 {
 	camera_scan_publisher.publish(scan);
 }
