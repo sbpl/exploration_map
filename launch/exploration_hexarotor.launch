@@ -4,7 +4,7 @@
     <include file="$(find utacc_multimaster)/launch/hexa_gateway.launch"/> 
     <include file="$(find utacc_exploration)/launch/hexa_exploration_executive.launch"/>
     <include file="$(find ooi_detection)/launch/hexa_detection.launch"/>
-    <include file="$(find move_base_3D)/launch/move_base_3D.launch"/>
+    <include file="$(find move_base_3d)/launch/move_base_3d.launch"/>
     <include file="$(find utacc_exploration)/launch/hexa_laser_health_monitor.launch"/>
 
     <node name="goal_relay" pkg="topic_tools" type="relay" args="hexa_active_goal goal_pose"/>
