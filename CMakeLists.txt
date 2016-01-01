@@ -25,8 +25,8 @@ catkin_package(
         sensor_update
         exploration_map
     CATKIN_DEPENDS
-        message_runtime 
-        sensor_msgs 
+        message_runtime
+        sensor_msgs
         std_msgs
     DEPENDS)
 
@@ -34,3 +34,10 @@ include_directories(${catkin_INCLUDE_DIRS})
 include_directories(include)
 
 add_subdirectory(src)
+
+install(
+    DIRECTORY include/exploration_map/
+    DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION})
+install(DIRECTORY config DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+install(DIRECTORY launch DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
+install(DIRECTORY scripts DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION})
