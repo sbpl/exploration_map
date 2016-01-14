@@ -1,6 +1,6 @@
 <launch>
     <node name="map_merger" pkg="exploration_map" type="map_merger_node">
-        <rosparam command="load" file="$(find exploration_map)/config/map_merger/map_merger_node.yaml"/>
+        <rosparam command="load" file="$(find exploration_map)/config/map_merger/map_merger.yaml"/>
         <rosparam command="load" file="$(find utacc_exploration)/config/exploration_common.yaml"/>
     </node>
 </launch>
