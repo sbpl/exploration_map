@@ -4,15 +4,19 @@ project(exploration_map)
 set(CMAKE_BUILD_TYPE Release)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
+find_package(PCL REQUIRED)
+
 find_package(catkin REQUIRED
     COMPONENTS
         geometry_msgs
+        nav_msgs
         pcl_conversions
         pcl_ros
         roscpp
         sensor_msgs
         std_msgs
-        tf)
+        tf
+        tf2_ros)
 
 add_message_files(DIRECTORY msg FILES camera_scan.msg)
 
@@ -24,12 +28,15 @@ catkin_package(
     LIBRARIES
         sensor_update
         exploration_map
+        map_merger
     CATKIN_DEPENDS
         message_runtime
         sensor_msgs
         std_msgs
+        tf2_ros
     DEPENDS)
 
+include_directories(${PCL_INCLUDE_DIRS})
 include_directories(${catkin_INCLUDE_DIRS})
 include_directories(include)
 

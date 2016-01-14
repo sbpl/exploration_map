@@ -5,7 +5,7 @@
  *      Author: bmacallister
  */
 
-#include <exploration_map/camera_node/camera_node.h>
+#include "camera_node.h"
 
 camera_scan_node::camera_scan_node() :
     nh(),
