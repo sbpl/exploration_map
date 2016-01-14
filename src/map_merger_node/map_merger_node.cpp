@@ -59,11 +59,11 @@ void map_merger_node::setup_ros()
 
     ph.param("publish_inner_maps", m_publish_inner_maps, false);
 
-    ROS_INFO("frame %s\n", frame_name.c_str());
-    ROS_INFO("map_resolution %f\n", map_resolution);
+    ROS_INFO("frame %s", frame_name.c_str());
+    ROS_INFO("map_resolution %f", map_resolution);
     ROS_ERROR("scan_match_dx %d", scan_match_dx);
     ROS_ERROR("scan_match_dyaw %d", scan_match_dyaw);
-    ROS_ERROR("map publish rate %f\n", map_publish_rate);
+    ROS_ERROR("map publish rate %f", map_publish_rate);
 
     //timers
     map_publish_timer = ph.createTimer(ros::Duration(map_publish_rate), &map_merger_node::map_publish_callback, this);
@@ -85,14 +85,6 @@ void map_merger_node::setup_ros()
     robot_poses_publisher = nh.advertise<nav_msgs::Path>("robot_poses", 1);
     robot_0_goal_publisher = nh.advertise<geometry_msgs::PoseStamped>(goal_0_name.c_str(), 1);
     robot_1_goal_publisher = nh.advertise<geometry_msgs::PoseStamped>(goal_1_name.c_str(), 1);
-}
-
-int main(int argc, char ** argv)
-{
-    ros::init(argc, argv, "map_merger_node");
-    map_merger_node map_merger;
-    ROS_ERROR("map merger made\n");
-    ros::spin();
 }
 
 void map_merger_node::map_publish_callback(const ros::TimerEvent& event)
@@ -125,6 +117,10 @@ void map_merger_node::robot_0_map_callback(const pcl::PointCloud<pcl::PointXYZI>
     }
     exp_seq = map_0_point_cloud.header.seq + 1;
 
+    if (msg->header.frame_id != merger.get_map_frame_id(0)) {
+        merger.update_frame_id(msg->header.frame_id, 0);
+    }
+
     //get map update
     exploration::map_update update;
     update.map_id = 0;
@@ -133,7 +129,7 @@ void map_merger_node::robot_0_map_callback(const pcl::PointCloud<pcl::PointXYZI>
     //update map merger
     merger.receive_map_update(update, updated_cell_list);
 
-    ROS_INFO("map 0 update finished\n");
+    ROS_INFO("map 0 update finished");
 }
 
 void map_merger_node::robot_1_map_callback(const pcl::PointCloud<pcl::PointXYZI>::ConstPtr& msg)
@@ -146,6 +142,10 @@ void map_merger_node::robot_1_map_callback(const pcl::PointCloud<pcl::PointXYZI>
     }
     exp_seq = map_1_point_cloud.header.seq + 1;
 
+    if (msg->header.frame_id != merger.get_map_frame_id(1)) {
+        merger.update_frame_id(msg->header.frame_id, 1);
+    }
+
     //get map update
     exploration::map_update update;
     update.map_id = 1;
@@ -154,7 +154,7 @@ void map_merger_node::robot_1_map_callback(const pcl::PointCloud<pcl::PointXYZI>
     //update map merger
     merger.receive_map_update(update, updated_cell_list);
 
-    ROS_INFO("map 1 update finished\n");
+    ROS_INFO("map 1 update finished");
 }
 
 void map_merger_node::publish_master_map()
@@ -168,7 +168,7 @@ void map_merger_node::publish_master_map()
 
 void map_merger_node::publish_point_cloud(const std::vector<pcl::PointXYZI> & points, const ros::Publisher & pub)
 {
-    ROS_ERROR("publish point cloud with %d points\n", (int ) points.size());
+    ROS_ERROR("publish point cloud with %d points", (int ) points.size());
     pcl::PointCloud<pcl::PointXYZI> cloud;
     cloud.points.resize(points.size());
     std::copy(points.begin(), points.end(), cloud.points.begin());
@@ -468,4 +468,12 @@ void map_merger_node::goal_list_callback(const nav_msgs::PathConstPtr& msg)
             ros::Duration(1.0).sleep();
         }
     }
+}
+
+int main(int argc, char ** argv)
+{
+    ros::init(argc, argv, "map_merger_node");
+    map_merger_node map_merger;
+    ROS_ERROR("map merger made");
+    ros::spin();
 }

@@ -1,13 +1,17 @@
-/*
- * map_merger.h
- *
- *  Created on: Nov 14, 2014
- *      Author: bmacallister
- */
+///////////////////////////////////////
+///
+/// map_merger.h
+///
+///  Created on: Nov 14, 2014
+///      Author: bmacallister
+///
+///////////////////////////////////////
 
 #include <algorithm>
 #include <iostream>
 #include <string>
+
+#include <tf2_ros/static_transform_broadcaster.h>
 
 #include <exploration_map/exploration_map/exploration_map.h>
 #include <exploration_map/exploration_map/exploration_map.hpp>
@@ -153,6 +157,7 @@ public:
 	 * @return success of procedure
 	 */
 	int receive_map_update(const map_update & update, cell_list & updated_cells);
+    int update_frame_id(const std::string& frame_id, int map_id);
 
 	/**
 	 * \brief returns a reference to the inner map in question
@@ -161,6 +166,7 @@ public:
 	 * @return success of call
 	 */
 	int get_map(int map_id, const generic_map<exploration_type>*& map);
+    std::string get_map_frame_id(int map_id) const;
 
 	/**
 	 * \brief returns a reference to the origin for the map in question
@@ -206,9 +212,19 @@ private:
 	 *
 	 */
 	/// @{
+
+    // TODO: feels bad to put ROS-related stuff in here, but the asynchronous
+    // nature of map_merger_node doesn't give much of a choice...maybe a new
+    // return code can be added to receive_map_update to reflect whether the
+    // offset between the two robots' maps was computed
+    // NOTE: this will have to be changed to a non-static transform broadcaster
+    // if/when we're dealing with more than two robots
+    tf2_ros::StaticTransformBroadcaster broadcaster_;
+
 	map_merge_config config_;
 	std::vector<generic_map<exploration_type> > maps_;
 	std::vector<int> map_counter_;
+    std::vector<std::string> map_frame_ids_;
 	std::vector<pose> map_origins_;
 	generic_map<exploration_type> master_map_;
 	bool origins_initialized_;

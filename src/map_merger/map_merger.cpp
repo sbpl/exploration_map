@@ -1,9 +1,11 @@
-/*
- * map_merger.cpp
- *
- *  Created on: Nov 14, 2014
- *      Author: bmacallister
- */
+///////////////////////////////////////
+///
+/// map_merger.cpp
+///
+///  Created on: Nov 14, 2014
+///      Author: bmacallister
+///
+///////////////////////////////////////
 
 #include <exploration_map/map_merger/map_merger.h>
 
@@ -31,18 +33,18 @@ void exploration::map_merger::initialize(map_merge_config _config)
 	int size_y = config_.map_config_.size_y;
 	int size_z = config_.map_config_.size_z;
 
-	printf("scan_match dx %d\n", config_.scan_match_config_.dx);
+	ROS_INFO("scan_match dx %d", config_.scan_match_config_.dx);
 
 	//initialize maps and origins
 	for (int i = 0; i < map_num; i++)
 	{
 		generic_map<exploration_type> m;
 		m.initialize(resolution, size_x, size_y, size_z);
+        map_frame_ids_.push_back(std::string());
 		maps_.push_back(std::move(m)); //move constructor
 
 		pose empty_pose;
-		printf("%f %f %f , %f %f %f %f\n", empty_pose.pos.x, empty_pose.pos.y, empty_pose.pos.z, empty_pose.ori.x, empty_pose.ori.y, empty_pose.ori.z,
-				empty_pose.ori.w);
+		ROS_INFO("%f %f %f , %f %f %f %f", empty_pose.pos.x, empty_pose.pos.y, empty_pose.pos.z, empty_pose.ori.x, empty_pose.ori.y, empty_pose.ori.z, empty_pose.ori.w);
 		map_origins_.push_back(empty_pose);
 	}
 
@@ -65,7 +67,7 @@ int exploration::map_merger::receive_map_update(const map_update& update, cell_l
 	}
 
 	//update specified map: no transform required
-	printf("update map %d\n", update.map_id);
+	ROS_INFO("update map %d", update.map_id);
 	cell_list locally_updated_cells;
 	update_map(update, pose(), maps_[map_id], &locally_updated_cells);
 
@@ -76,7 +78,7 @@ int exploration::map_merger::receive_map_update(const map_update& update, cell_l
 	bool update_master = true;
 	for (auto c : map_counter_)
 	{
-		//printf("map counter value %d\n", c);
+		//ROS_INFO("map counter value %d", c);
 		if (c < 10)
 		{
 			update_master = false;
@@ -84,12 +86,11 @@ int exploration::map_merger::receive_map_update(const map_update& update, cell_l
 		}
 	}
 
-	printf("size of map origins is %d\n", (int) map_origins_.size());
+	ROS_INFO("size of map origins is %d", (int) map_origins_.size());
 	for (auto empty_pose : map_origins_)
 	{
 		//empty_pose
-		printf("%f %f %f , %f %f %f %f\n", empty_pose.pos.x, empty_pose.pos.y, empty_pose.pos.z, empty_pose.ori.x, empty_pose.ori.y, empty_pose.ori.z,
-				empty_pose.ori.w);
+		ROS_INFO("%f %f %f , %f %f %f %f", empty_pose.pos.x, empty_pose.pos.y, empty_pose.pos.z, empty_pose.ori.x, empty_pose.ori.y, empty_pose.ori.z, empty_pose.ori.w);
 	}
 
 	if (update_master)
@@ -102,7 +103,7 @@ int exploration::map_merger::receive_map_update(const map_update& update, cell_l
 		}
 
 		//update master map frame using its transform from child frame
-		printf("update master map with map id %d\n", (int) map_id);
+		ROS_INFO("update master map with map id %d", (int) map_id);
 		update_map(update, map_origins_[map_id], master_map_, &updated_cells);
 	}
 	else
@@ -115,6 +116,16 @@ int exploration::map_merger::receive_map_update(const map_update& update, cell_l
 
 }
 
+int exploration::map_merger::update_frame_id(const std::string& frame_id, int map_id)
+{
+    if (map_id >= config_.number_of_maps) {
+        return 0;
+    }
+    else {
+        map_frame_ids_[map_id] = frame_id;
+    }
+}
+
 int exploration::map_merger::get_map(int map_id, const generic_map<exploration_type>*& map)
 {
 	if (map_id >= config_.number_of_maps)
@@ -125,6 +136,15 @@ int exploration::map_merger::get_map(int map_id, const generic_map<exploration_t
 	map = &maps_[map_id];
 
 	return 1;
+}
+
+std::string exploration::map_merger::get_map_frame_id(int map_id) const
+{
+    if (map_id >= config_.number_of_maps) {
+        return std::string();
+    }
+
+    return map_frame_ids_[map_id];
 }
 
 int exploration::map_merger::get_master_map(const generic_map<exploration_type>*& map)
@@ -140,7 +160,7 @@ int exploration::map_merger::update_map(const map_update& update, const pose& de
 	auto destination = destination_frame;
 	int update_count = 0;
 
-	printf("update map using pos %f %f %f\n", destination_frame.pos.x, destination_frame.pos.y, destination_frame.pos.z);
+	ROS_INFO("update map using pos %f %f %f", destination_frame.pos.x, destination_frame.pos.y, destination_frame.pos.z);
 
 	for (auto p : update.points)
 	{
@@ -177,7 +197,7 @@ int exploration::map_merger::update_map(const map_update& update, const pose& de
 		}
 
 	}
-	//printf("number of obstacles is %d\n", obs_count);
+	//ROS_INFO("number of obstacles is %d", obs_count);
 	return update_count;
 }
 
@@ -191,7 +211,7 @@ void exploration::map_merger::generate_initial_transforms()
 	double m_res = config_.scan_match_config_.metric_res;
 	double a_res = config_.scan_match_config_.angular_res;
 
-	printf("generate initial transforms\n");
+	ROS_INFO("generate initial transforms");
 
 	//set master map values to first map
 	master_map_.map_ = maps_[0].map_;
@@ -229,11 +249,8 @@ void exploration::map_merger::generate_initial_transforms()
 				}
 			}
 		}
-		//printf("number of occupied cells in scan %d \n", occ_cells);
+		//ROS_INFO("number of occupied cells in scan %d ", occ_cells);
 	}
-
-//	std::string blah2;
-//	std::cin >> blah2;
 
 	std::vector<pose> best_origin_list;
 
@@ -266,7 +283,7 @@ void exploration::map_merger::generate_initial_transforms()
 						double yc = static_cast<double>(dy) * m_res;
 						double zc = static_cast<double>(dz) * m_res;
 						double yawc = static_cast<double>(dyaw) * a_res;
-						//printf("dyaw %d yawc%f\n", dyaw, yawc);
+						//ROS_INFO("dyaw %d yawc%f", dyaw, yawc);
 						pose trans;
 						trans.pos.x = xc;
 						trans.pos.y = yc;
@@ -316,9 +333,9 @@ void exploration::map_merger::generate_initial_transforms()
 							}
 						}
 
-						//printf("origin position %f %f %f\n", trans.pos.x, trans.pos.y, trans.pos.z);
-						//printf("origin orientation %f %f %f %f\n", trans.ori.w, trans.ori.x, trans.ori.y, trans.ori.z);
-						//printf("affinity %d\n", affinity);
+						//ROS_INFO("origin position %f %f %f", trans.pos.x, trans.pos.y, trans.pos.z);
+						//ROS_INFO("origin orientation %f %f %f %f", trans.ori.w, trans.ori.x, trans.ori.y, trans.ori.z);
+						//ROS_INFO("affinity %d", affinity);
 
 						//if affinity > max_affinity
 						if (affinity > max_affinity)
@@ -334,9 +351,9 @@ void exploration::map_merger::generate_initial_transforms()
 				}
 			}
 		}
-		printf("best affinity %d\n", max_affinity);
-		printf("best origin position %f %f %f\n", best_origin.pos.x, best_origin.pos.y, best_origin.pos.z);
-		printf("best origin orientation %f %f %f %f\n", best_origin.ori.w, best_origin.ori.x, best_origin.ori.y, best_origin.ori.z);
+		ROS_INFO("best affinity %d", max_affinity);
+		ROS_INFO("best origin position %f %f %f", best_origin.pos.x, best_origin.pos.y, best_origin.pos.z);
+		ROS_INFO("best origin orientation %f %f %f %f", best_origin.ori.w, best_origin.ori.x, best_origin.ori.y, best_origin.ori.z);
 		best_origin_list.push_back(best_origin);
 	}
 
@@ -344,9 +361,23 @@ void exploration::map_merger::generate_initial_transforms()
 	for (size_t i = 1; i < map_origins_.size(); i++)
 	{
 		map_origins_[i] = best_origin_list[i - 1];
-		printf("map_origins %d is %f %f %f\n", (int) i, map_origins_[i].pos.x, map_origins_[i].pos.y, map_origins_[i].pos.z);
-	}
+		ROS_INFO("map_origins %d is %f %f %f", (int) i, map_origins_[i].pos.x, map_origins_[i].pos.y, map_origins_[i].pos.z);
 
+        ROS_WARN("Broadcasting transform from master map '%s' to map '%s'", map_frame_ids_[0].c_str(), map_frame_ids_[i].c_str());
+        geometry_msgs::TransformStamped transform;
+        transform.header.seq = 0;
+        transform.header.stamp = ros::Time(0);
+        transform.header.frame_id = map_frame_ids_[0]; //"map"; //config_.map_config_...
+        transform.child_frame_id = map_frame_ids_[i];
+        transform.transform.translation.x = best_origin_list[i - 1].pos.x;
+        transform.transform.translation.y = best_origin_list[i - 1].pos.y;
+        transform.transform.translation.z = best_origin_list[i - 1].pos.z;
+        transform.transform.rotation.w = best_origin_list[i - 1].ori.w;
+        transform.transform.rotation.x = best_origin_list[i - 1].ori.x;
+        transform.transform.rotation.y = best_origin_list[i - 1].ori.y;
+        transform.transform.rotation.z = best_origin_list[i - 1].ori.z;
+        broadcaster_.sendTransform(transform);
+	}
 }
 
 int exploration::map_merger::get_origin(int map_id, const pose*& origin)
