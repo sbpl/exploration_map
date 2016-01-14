@@ -8,9 +8,9 @@
 #include <exploration_map/camera_node/camera_node.h>
 
 camera_scan_node::camera_scan_node() :
+    nh(),
     ph("~")
 {
-    frame_id = "";
     sensor_field_of_view_rad = 0;
     sensor_distance = 0;
 
@@ -23,9 +23,8 @@ camera_scan_node::~camera_scan_node()
 
 void camera_scan_node::ros_configure()
 {
-    if (!ph.getParam("image_topic_name", image_topic_name) ||
-        !ph.getParam("frame", frame_id) ||
-        !ph.getParam("sensor_field_of_view", sensor_field_of_view_rad) ||
+    image_topic_name = "image";
+    if (!ph.getParam("sensor_field_of_view", sensor_field_of_view_rad) ||
         !ph.getParam("sensor_distance", sensor_distance) ||
         !ph.getParam("sensor_angular_res", sensor_angular_resolution))
     {

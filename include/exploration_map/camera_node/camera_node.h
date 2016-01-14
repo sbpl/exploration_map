@@ -58,7 +58,6 @@ private:
     ros::Subscriber camera_subscriber;
     ros::Publisher camera_scan_publisher;
 
-    std::string frame_id;
     std::string image_topic_name;
 
     //scan related
