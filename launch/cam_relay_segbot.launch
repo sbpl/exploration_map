@@ -1,3 +1,0 @@
-<launch>
-    <node name="image_relay" pkg="image_transport" type="republish" args="compressed in:=segbot_cam/image_raw raw out:=segbot_cam"/>
-</launch>
