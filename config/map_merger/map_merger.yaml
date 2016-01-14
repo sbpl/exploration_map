@@ -1,28 +1,13 @@
-frame: /map
-#map params
-map_resolution: 0.1
-map_origin_x: -1.025
-map_origin_y: -12.025
-map_origin_z: 0.0
-map_size_x: 1200
-map_size_y: 700
-map_size_z: 50
- 
-#map names
-robot_0_map_name: /segbot_map_e2
-robot_1_map_name: /hexa_map_e2
+#frame: map
+##map params
+#map_resolution: 0.1
+#map_origin_x: -1.025
+#map_origin_y: -12.025
+#map_origin_z: 0.0
+#map_size_x: 1200
+#map_size_y: 700
+#map_size_z: 50
 
-#robot pose names
-robot_0_pose_name: /segbot_pose_e2
-robot_1_pose_name: /hexa_pose_e2
-
-#goal names
-goal_0_name: /segbot_goal
-goal_1_name: /hexa_goal
-
-#goal list name
-goal_list_name: /robot_goals
- 
 #scan matching
 scan_match_ang_res: 0.05
 scan_match_met_res: 0.1
@@ -31,7 +16,7 @@ scan_match_dy: 5
 scan_match_dz: 0
 scan_match_dyaw: 8
 
-#other 
+#other
 map_publish_rate: 1.0
 
 # debug

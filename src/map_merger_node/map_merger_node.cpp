@@ -30,6 +30,14 @@ void map_merger_node::initialize()
 
 void map_merger_node::setup_ros()
 {
+    robot_0_map_name = "robot_0_map";
+    robot_0_pose_name = "robot_0_pose";
+    robot_1_map_name = "robot_1_map";
+    robot_1_pose_name = "robot_1_pose";
+    goal_0_name = "robot_0_goal";
+    goal_1_name = "robot_1_goal";
+    goal_list_name = "robot_goals";
+
     if (!ph.getParam("frame", frame_name) ||
         !ph.getParam("map_resolution", map_resolution) ||
         !ph.getParam("map_origin_x", map_origin_x) ||
@@ -38,20 +46,13 @@ void map_merger_node::setup_ros()
         !ph.getParam("map_size_x", map_size_x) ||
         !ph.getParam("map_size_y", map_size_y) ||
         !ph.getParam("map_size_z", map_size_z) ||
-        !ph.getParam("robot_0_map_name", robot_0_map_name) ||
-        !ph.getParam("robot_1_map_name", robot_1_map_name) ||
-        !ph.getParam("robot_0_pose_name", robot_0_pose_name) ||
-        !ph.getParam("robot_1_pose_name", robot_1_pose_name) ||
-        !ph.getParam("goal_list_name", goal_list_name) ||
         !ph.getParam("map_publish_rate", map_publish_rate) ||
         !ph.getParam("scan_match_ang_res", scan_match_angular_res) ||
         !ph.getParam("scan_match_met_res", scan_match_metric_res) ||
         !ph.getParam("scan_match_dx", scan_match_dx) ||
         !ph.getParam("scan_match_dy", scan_match_dy) ||
         !ph.getParam("scan_match_dz", scan_match_dz) ||
-        !ph.getParam("scan_match_dyaw", scan_match_dyaw) ||
-        !ph.getParam("goal_0_name", goal_0_name) ||
-        !ph.getParam("goal_1_name", goal_1_name))
+        !ph.getParam("scan_match_dyaw", scan_match_dyaw))
     {
         throw std::runtime_error("Failed to retrieve some parameters from the param server");
     }
