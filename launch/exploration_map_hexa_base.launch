@@ -1,0 +1,15 @@
+<launch>
+    <node name="exploration_map" pkg="exploration_map" type="exploration_map_node">
+        <rosparam command="load" file="$(find exploration_map)/config/exploration_map/exploration_map_hexa.yaml"/>
+        <rosparam command="load" file="$(find utacc_exploration)/config/exploration_common.yaml"/>
+        <remap from="exploration_map/exploration_map" to="hexa_map"/>
+        <remap from="exploration_map/robot_pose" to="hexa_pose"/>
+        <remap from="horizontal_scan" to="fixed_laser"/>
+        <remap from="vertical_scan" to="panning_laser"/>
+    </node>
+
+    <node name="camera_node" pkg="exploration_map" type="camera_node">
+        <rosparam command="load" file="$(find exploration_map)/config/camera_node/camera_node.yaml"/>
+        <remap from="image" to="hexa_cam/image"/>
+    </node>
+</launch>
