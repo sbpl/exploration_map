@@ -1,0 +1,25 @@
+  frame: map
+  map_resolution: 0.1
+  map_origin_x: -1.025
+  map_origin_y: -12.025
+  map_origin_z: 0.0
+  map_size_x: 1200
+  map_size_y: 700
+  map_size_z: 50
+  ground_plane_height_threshold: -3.0
+  unnocupied_prob_threshold: 0.4
+  occupancy_prob_threshold: 0.6
+  lidar_update_increment: 0.2
+  lidar_update_decrement: 0.05
+  min_sensor_distance_threshold: 0.6
+
+  horizontal_lidar_pose_tf_name: base_laser_link
+  vertical_lidar_pose_tf_name: tilt_laser_link
+  camera_pose_tf_name: base_laser_link
+  robot_pose_tf_name: base_footprint
+  robot_radius: 0.5
+  robot_height: 2.0
+
+  map_publish_rate: 2.0
+  number_of_scans_to_skip: 0
+  publish_debug_messages: false

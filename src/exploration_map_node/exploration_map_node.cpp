@@ -30,6 +30,9 @@ exploration_map_node::~exploration_map_node()
 void exploration_map_node::ros_configure()
 {
     // get params
+    horizontal_lidar_topic_name = "horizontal_scan";
+    vertical_lidar_topic_name = "vertical_scan";
+    camera_scan_topic_name = "camera_scan";
     if (!pn.getParam("frame", frame_name) ||
         !pn.getParam("map_resolution", map_resolution) ||
         !pn.getParam("map_origin_x", map_origin.x) ||
@@ -42,9 +45,6 @@ void exploration_map_node::ros_configure()
         !pn.getParam("vertical_lidar_pose_tf_name", vertical_lidar_pose_tf_name) ||
         !pn.getParam("camera_pose_tf_name", camera_pose_tf_name) ||
         !pn.getParam("robot_pose_tf_name", robot_pose_tf_name) ||
-        !pn.getParam("horizontal_lidar_topic_name", horizontal_lidar_topic_name) ||
-        !pn.getParam("vertical_lidar_topic_name", vertical_lidar_topic_name) ||
-        !pn.getParam("camera_scan_topic_name", camera_scan_topic_name) ||
         !pn.getParam("lidar_update_increment", lidar_update_increment) ||
         !pn.getParam("lidar_update_decrement", lidar_update_decrement) ||
         !pn.getParam("occupancy_prob_threshold", occupancy_prob_thresh) ||
