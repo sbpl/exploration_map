@@ -78,7 +78,7 @@ private:
 
     void publish_point_cloud(const std::vector<pcl::PointXYZI> & points, const ros::Publisher & pub);
 
-    bool get_lateset_pose_from_tf(
+    bool get_latest_pose_from_tf(
         geometry_msgs::PoseStamped & pose,
         const std::string & pose_name,
         const ros::Time & time);
@@ -102,14 +102,18 @@ private:
     int map_size_x;
     int map_size_y;
     int map_size_z;
+
+    std::string tf_prefix;
     std::string frame_name;
     std::string horizontal_lidar_pose_tf_name;
     std::string vertical_lidar_pose_tf_name;
     std::string camera_pose_tf_name;
     std::string robot_pose_tf_name;
+
     std::string horizontal_lidar_topic_name;
     std::string vertical_lidar_topic_name;
     std::string camera_scan_topic_name;
+
     double map_publish_rate;
 
     double occupancy_prob_thresh;

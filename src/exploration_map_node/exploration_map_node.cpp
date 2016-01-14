@@ -29,6 +29,8 @@ exploration_map_node::~exploration_map_node()
 
 void exploration_map_node::ros_configure()
 {
+    tf_prefix = tf::getPrefixParam(pn);
+
     // get params
     horizontal_lidar_topic_name = "horizontal_scan";
     vertical_lidar_topic_name = "vertical_scan";
@@ -60,16 +62,29 @@ void exploration_map_node::ros_configure()
         throw std::runtime_error("Failed to retrieve some parameters from the param server");
     }
 
-    ROS_INFO("subscribed to %s and %s\n", horizontal_lidar_pose_tf_name.c_str(), horizontal_lidar_topic_name.c_str());
-    ROS_INFO("subscribed to %s and %s\n", camera_pose_tf_name.c_str(), camera_scan_topic_name.c_str());
-    ROS_INFO("subscribed to %s and %s\n", vertical_lidar_pose_tf_name.c_str(), vertical_lidar_topic_name.c_str());
-    ROS_INFO("min distance threshold for sensors %f\n", min_sensor_distance_threshold);
-    ROS_INFO("publish debugging messages (%d) \n", publish_debug_messages);
+    frame_name = tf::resolve(tf_prefix, frame_name);
+    horizontal_lidar_pose_tf_name = tf::resolve(tf_prefix, horizontal_lidar_pose_tf_name);
+    vertical_lidar_pose_tf_name = tf::resolve(tf_prefix, vertical_lidar_pose_tf_name);
+    camera_pose_tf_name = tf::resolve(tf_prefix, camera_pose_tf_name);
+    robot_pose_tf_name = tf::resolve(tf_prefix, robot_pose_tf_name);
+
+    ROS_INFO("Map Frame ID: %s", frame_name.c_str());
+    ROS_INFO("Horizontal Lidar Frame ID: %s", horizontal_lidar_pose_tf_name.c_str());
+    ROS_INFO("Vertical Lidar Frame ID: %s", vertical_lidar_pose_tf_name.c_str());
+    ROS_INFO("Camera Frame ID: %s", camera_pose_tf_name.c_str());
+    ROS_INFO("Robot Frame ID: %s", robot_pose_tf_name.c_str());
 
     // subscribe
     horiz_lidar_sub = n.subscribe(horizontal_lidar_topic_name, 40, &exploration_map_node::horizontal_lidar_callback, this);
     camera_scan_sub = n.subscribe(camera_scan_topic_name, 40, &exploration_map_node::camera_scan_callback, this);
     verti_lidar_sub = n.subscribe(vertical_lidar_topic_name, 40, &exploration_map_node::vertical_lidar_callback, this);
+
+    ROS_INFO("subscribed to %s", horiz_lidar_sub.getTopic().c_str());
+    ROS_INFO("subscribed to %s", camera_scan_sub.getTopic().c_str());
+    ROS_INFO("subscribed to %s", verti_lidar_sub.getTopic().c_str());
+
+    ROS_INFO("min distance threshold for sensors %f\n", min_sensor_distance_threshold);
+    ROS_INFO("publish debugging messages (%d) \n", publish_debug_messages);
 
     // timer
     map_publish_timer = n.createTimer(ros::Duration(1.0 / map_publish_rate), &exploration_map_node::map_publish_timer_callback, this);
@@ -100,7 +115,7 @@ void exploration_map_node::horizontal_lidar_callback(const sensor_msgs::LaserSca
     }
 
     geometry_msgs::PoseStamped pose;
-    if (!get_lateset_pose_from_tf(pose, horizontal_lidar_pose_tf_name, msg->header.stamp)) {
+    if (!get_latest_pose_from_tf(pose, horizontal_lidar_pose_tf_name, msg->header.stamp)) {
         ROS_ERROR("Error: could not process horizontal lidar because latest pose could not be retrieved");
         return;
     }
@@ -225,14 +240,20 @@ void exploration_map_node::publish_point_cloud(const std::vector<pcl::PointXYZI>
     pub.publish(cloud);
 }
 
-bool exploration_map_node::get_lateset_pose_from_tf(
+bool exploration_map_node::get_latest_pose_from_tf(
     geometry_msgs::PoseStamped& pose,
     const std::string & pose_name,
     const ros::Time & time)
 {
     auto input_pose = pose;
     input_pose.header.frame_id = pose_name;
-    input_pose.header.stamp = time;
+
+    // TODO: using the time of the sensor data seems to cause problems,
+    // especially during sim, where the sensor data somehow comes from the
+    // future...going to use the latest time for now, but perhaps this may
+    // warrant a special case for sim depending on live behavior, and could be
+    // encapsulated via a 'transform_policy' parameter
+    input_pose.header.stamp = ros::Time(0); // time;
     input_pose.pose.position.x = 0;
     input_pose.pose.position.y = 0;
     input_pose.pose.position.z = 0;
@@ -242,9 +263,8 @@ bool exploration_map_node::get_lateset_pose_from_tf(
     input_pose.pose.orientation.z = 0;
 
     try {
-        listener.transformPose("map", input_pose, pose);
+        listener.transformPose(frame_name, input_pose, pose);
     }
-
     catch (tf::TransformException &e) {
         ROS_ERROR("ERROR: could not get pose from tf\n, %s", e.what());
         return false;
@@ -291,7 +311,7 @@ bool exploration_map_node::update_exploration_map(const sensor_update::sensor_up
 
 void exploration_map_node::camera_scan_callback(const exploration_map::camera_scanConstPtr& msg)
 {
-    //skip scan if required
+    // skip scan if required
     if (camera_scan_counter < number_of_scans_to_skip) {
         camera_scan_counter++;
         return;
@@ -300,9 +320,9 @@ void exploration_map_node::camera_scan_callback(const exploration_map::camera_sc
         camera_scan_counter = 0;
     }
 
-    //get camera pose
+    // get camera pose
     geometry_msgs::PoseStamped camera_pose;
-    if (!get_lateset_pose_from_tf(camera_pose, camera_pose_tf_name, msg->header.stamp)) {
+    if (!get_latest_pose_from_tf(camera_pose, camera_pose_tf_name, msg->header.stamp)) {
         ROS_ERROR("could not retrieve pose for camera scan");
         return;
     }
@@ -397,7 +417,7 @@ void exploration_map_node::vertical_lidar_callback(const sensor_msgs::LaserScanC
     }
 
     geometry_msgs::PoseStamped pose;
-    if (!get_lateset_pose_from_tf(pose, vertical_lidar_pose_tf_name, msg->header.stamp)) {
+    if (!get_latest_pose_from_tf(pose, vertical_lidar_pose_tf_name, msg->header.stamp)) {
         ROS_ERROR("Error: could not process vertical lidar because latest pose could not be retrieved");
         return;
     }
@@ -508,7 +528,7 @@ void exploration_map_node::publish_exploration_map_update()
 
 void exploration_map_node::update_robot_pose(const ros::Time & time)
 {
-    if (!get_lateset_pose_from_tf(current_robot_pose, robot_pose_tf_name, time)) {
+    if (!get_latest_pose_from_tf(current_robot_pose, robot_pose_tf_name, time)) {
         ROS_ERROR("could not get current robot pose");
     }
 }
