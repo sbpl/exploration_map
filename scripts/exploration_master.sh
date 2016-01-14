@@ -1,4 +1,4 @@
 #!/bin/bash
 
-roslaunch exploration_launch exploration_master.launch -p 11312
+roslaunch exploration_map exploration_master.launch -p 11312
 

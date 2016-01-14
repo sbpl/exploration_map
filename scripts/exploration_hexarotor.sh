@@ -2,5 +2,5 @@
 
 start_avahi
 
-roslaunch exploration_launch exploration_hexarotor.launch -p 11311
+roslaunch exploration_map exploration_hexarotor.launch -p 11311
 

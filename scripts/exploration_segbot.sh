@@ -2,6 +2,6 @@
 
 start_avahi
 
-roslaunch exploration_launch exploration_segbot.launch -p 11311
+roslaunch exploration_map exploration_segbot.launch -p 11311
 
 

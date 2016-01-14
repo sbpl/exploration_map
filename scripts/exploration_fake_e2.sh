@@ -1,3 +1,3 @@
 #!/bin/bash
 
-roslaunch exploration_launch exploration_fake_e2.launch -p 11311
+roslaunch exploration_map exploration_fake_e2.launch -p 11311
