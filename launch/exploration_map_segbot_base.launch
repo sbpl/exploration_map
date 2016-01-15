@@ -1,7 +1,6 @@
 <launch>
     <node name="exploration_map" pkg="exploration_map" type="exploration_map_node">
         <rosparam command="load" file="$(find exploration_map)/config/exploration_map/exploration_map_segbot.yaml"/>
-        <rosparam command="load" file="$(find utacc_exploration)/config/exploration_common.yaml"/>
         <remap from="exploration_map/exploration_map" to="segbot_map"/>
         <remap from="exploration_map/robot_pose" to="segbot_pose"/>
         <remap from="horizontal_scan" to="base_scan"/>
