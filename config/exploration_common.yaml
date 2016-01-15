@@ -1,0 +1,8 @@
+frame: map
+map_resolution: 0.1
+map_origin_x: -1.025
+map_origin_y: -12.025
+map_origin_z: 0.0
+map_size_x: 1200
+map_size_y: 700
+map_size_z: 50

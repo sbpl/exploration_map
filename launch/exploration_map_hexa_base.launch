@@ -1,5 +1,6 @@
 <launch>
     <node name="exploration_map" pkg="exploration_map" type="exploration_map_node">
+        <rosparam command="load" file="$(find exploration_map)/config/exploration_common.yaml"/>
         <rosparam command="load" file="$(find exploration_map)/config/exploration_map/exploration_map_hexa.yaml"/>
         <remap from="exploration_map/exploration_map" to="hexa_map"/>
         <remap from="exploration_map/robot_pose" to="hexa_pose"/>

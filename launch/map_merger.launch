@@ -6,8 +6,8 @@
 
     <group if="$(arg ns)">
         <node name="map_merger" pkg="exploration_map" type="map_merger_node">
+            <rosparam command="load" file="$(find exploration_map)/config/exploration_common.yaml"/>
             <rosparam command="load" file="$(find exploration_map)/config/map_merger/map_merger.yaml"/>
-            <rosparam command="load" file="$(find utacc_exploration)/config/exploration_common.yaml"/>
             <remap from="robot_0_map" to="segbot/segbot_map"/>
             <remap from="robot_0_pose" to="segbot/segbot_pose"/>
             <remap from="robot_0_goal" to="segbot/move_base_simple/goal"/>
@@ -18,8 +18,8 @@
     </group>
     <group unless="$(arg ns)">
         <node name="map_merger" pkg="exploration_map" type="map_merger_node">
+            <rosparam command="load" file="$(find exploration_map)/config/exploration_common.yaml"/>
             <rosparam command="load" file="$(find exploration_map)/config/map_merger/map_merger.yaml"/>
-            <rosparam command="load" file="$(find utacc_exploration)/config/exploration_common.yaml"/>
             <remap from="robot_0_map" to="segbot_map_e2"/>
             <remap from="robot_0_pose" to="segbot_pose_2"/>
             <remap from="robot_0_goal" to="segbot_goal"/>
