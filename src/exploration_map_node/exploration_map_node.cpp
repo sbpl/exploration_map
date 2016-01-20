@@ -266,7 +266,7 @@ bool exploration_map_node::get_latest_pose_from_tf(
         listener.transformPose(frame_name, input_pose, pose);
     }
     catch (tf::TransformException &e) {
-        ROS_ERROR("ERROR: could not get pose from tf\n, %s", e.what());
+        ROS_WARN("Failed to transform pose (%s)", e.what());
         return false;
     }
 
@@ -529,7 +529,7 @@ void exploration_map_node::publish_exploration_map_update()
 void exploration_map_node::update_robot_pose(const ros::Time & time)
 {
     if (!get_latest_pose_from_tf(current_robot_pose, robot_pose_tf_name, time)) {
-        ROS_ERROR("could not get current robot pose");
+        ROS_WARN("could not get current robot pose");
     }
 }
 
