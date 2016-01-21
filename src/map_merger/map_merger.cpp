@@ -64,7 +64,7 @@ int exploration::map_merger::receive_map_update(const map_update& update, cell_l
     }
 
     //update specified map: no transform required
-    ROS_INFO("update map %d", update.map_id);
+    ROS_DEBUG("update map %d", update.map_id);
     cell_list locally_updated_cells;
     update_map(update, pose(), maps_[map_id], &locally_updated_cells);
 
@@ -81,10 +81,10 @@ int exploration::map_merger::receive_map_update(const map_update& update, cell_l
         }
     }
 
-    ROS_INFO("size of map origins is %d", (int ) map_origins_.size());
+    ROS_DEBUG("size of map origins is %d", (int ) map_origins_.size());
     for (auto empty_pose : map_origins_) {
         //empty_pose
-        ROS_INFO("%f %f %f , %f %f %f %f", empty_pose.pos.x, empty_pose.pos.y, empty_pose.pos.z, empty_pose.ori.x, empty_pose.ori.y, empty_pose.ori.z, empty_pose.ori.w);
+        ROS_DEBUG("%f %f %f , %f %f %f %f", empty_pose.pos.x, empty_pose.pos.y, empty_pose.pos.z, empty_pose.ori.x, empty_pose.ori.y, empty_pose.ori.z, empty_pose.ori.w);
     }
 
     if (update_master) {
@@ -95,7 +95,7 @@ int exploration::map_merger::receive_map_update(const map_update& update, cell_l
         }
 
         //update master map frame using its transform from child frame
-        ROS_INFO("update master map with map id %d", (int ) map_id);
+        ROS_DEBUG("update master map with map id %d", (int ) map_id);
         update_map(update, map_origins_[map_id], master_map_, &updated_cells);
     }
     else {
@@ -155,8 +155,7 @@ int exploration::map_merger::update_map(
     auto destination = destination_frame;
     int update_count = 0;
 
-    ROS_INFO("update map using pos %f %f %f", destination_frame.pos.x, destination_frame.pos.y,
-            destination_frame.pos.z);
+    ROS_DEBUG("update map using pos %f %f %f", destination_frame.pos.x, destination_frame.pos.y, destination_frame.pos.z);
 
     for (auto p : update.points) {
         //transform point to destination frame

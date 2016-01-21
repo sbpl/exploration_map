@@ -52,6 +52,7 @@ private:
     void publish_point_cloud(const std::vector<pcl::PointXYZI> & points, const ros::Publisher & pub);
 
     void publish_pose(const geometry_msgs::PoseStamped & pose, const ros::Publisher & pub);
+    void publish_pose(const geometry_msgs::PoseStamped& pose, const std::string& frame_id, const ros::Publisher& pub);
 
     void publish_robot_poses();
 

@@ -95,7 +95,7 @@ void map_merger_node::map_publish_callback(const ros::TimerEvent& event)
     }
 
     if (merger.origins_are_initialized()) {
-        ROS_ERROR("publish map");
+        ROS_DEBUG("publish map");
         publish_master_map();
 
         //publish map update
@@ -111,7 +111,7 @@ void map_merger_node::robot_0_map_callback(const pcl::PointCloud<pcl::PointXYZI>
 {
     static unsigned int exp_seq = 0;
     map_0_point_cloud = *msg;
-    ROS_INFO("got map 0 with seq number %d", map_0_point_cloud.header.seq);
+    ROS_DEBUG("got map 0 with seq number %d", map_0_point_cloud.header.seq);
     if (exp_seq != 0 and exp_seq != map_0_point_cloud.header.seq) {
         ROS_ERROR("sequence number for map 0 does not match expected (%d vs %d)", map_0_point_cloud.header.seq, exp_seq);
     }
@@ -129,14 +129,14 @@ void map_merger_node::robot_0_map_callback(const pcl::PointCloud<pcl::PointXYZI>
     //update map merger
     merger.receive_map_update(update, updated_cell_list);
 
-    ROS_INFO("map 0 update finished");
+    ROS_DEBUG("map 0 update finished");
 }
 
 void map_merger_node::robot_1_map_callback(const pcl::PointCloud<pcl::PointXYZI>::ConstPtr& msg)
 {
     static unsigned int exp_seq = 0;
     map_1_point_cloud = *msg;
-    ROS_INFO("got map 1 with seq number %d", map_1_point_cloud.header.seq);
+    ROS_DEBUG("got map 1 with seq number %d", map_1_point_cloud.header.seq);
     if (exp_seq != 0 and exp_seq != map_1_point_cloud.header.seq) {
         ROS_ERROR("sequence number for map 1 does not match expected (%d vs %d)", map_1_point_cloud.header.seq, exp_seq);
     }
@@ -154,7 +154,7 @@ void map_merger_node::robot_1_map_callback(const pcl::PointCloud<pcl::PointXYZI>
     //update map merger
     merger.receive_map_update(update, updated_cell_list);
 
-    ROS_INFO("map 1 update finished");
+    ROS_DEBUG("map 1 update finished");
 }
 
 void map_merger_node::publish_master_map()
@@ -168,7 +168,7 @@ void map_merger_node::publish_master_map()
 
 void map_merger_node::publish_point_cloud(const std::vector<pcl::PointXYZI> & points, const ros::Publisher & pub)
 {
-    ROS_ERROR("publish point cloud with %d points", (int ) points.size());
+    ROS_DEBUG("publish point cloud with %d points", (int ) points.size());
     pcl::PointCloud<pcl::PointXYZI> cloud;
     cloud.points.resize(points.size());
     std::copy(points.begin(), points.end(), cloud.points.begin());
@@ -238,12 +238,12 @@ void map_merger_node::convert_point_cloud_to_map_update(
 
 void map_merger_node::robot_0_pose_callback(const geometry_msgs::PoseStamped::ConstPtr& msg)
 {
-    ROS_INFO("got robot 0 pose");
+    ROS_DEBUG("got robot 0 pose");
     geometry_msgs::PoseStamped p = *(msg);
 
     auto pos = p.pose.position;
     auto ori = p.pose.orientation;
-    ROS_INFO("pose is %f %f %f, %f %f %f %f", pos.x, pos.y, pos.z, ori.w, ori.x, ori.y, ori.z);
+    ROS_DEBUG("pose is %f %f %f, %f %f %f %f", pos.x, pos.y, pos.z, ori.w, ori.x, ori.y, ori.z);
 
     //get map merger origin
     const exploration::pose * origin;
@@ -254,7 +254,7 @@ void map_merger_node::robot_0_pose_callback(const geometry_msgs::PoseStamped::Co
 
     pos = p.pose.position;
     ori = p.pose.orientation;
-    ROS_INFO("transformed to %f %f %f, %f %f %f %f", pos.x, pos.y, pos.z, ori.w, ori.x, ori.y, ori.z);
+    ROS_DEBUG("transformed to %f %f %f, %f %f %f %f", pos.x, pos.y, pos.z, ori.w, ori.x, ori.y, ori.z);
 
     //assign to list of poses
     robot_poses[0] = p;
@@ -265,12 +265,12 @@ void map_merger_node::robot_0_pose_callback(const geometry_msgs::PoseStamped::Co
 
 void map_merger_node::robot_1_pose_callback(const geometry_msgs::PoseStamped::ConstPtr& msg)
 {
-    ROS_INFO("got robot 1 pose");
+    ROS_DEBUG("got robot 1 pose");
     geometry_msgs::PoseStamped p = *(msg);
 
     auto pos = p.pose.position;
     auto ori = p.pose.orientation;
-    ROS_INFO("pose is %f %f %f, %f %f %f %f", pos.x, pos.y, pos.z, ori.w, ori.x, ori.y, ori.z);
+    ROS_DEBUG("pose is %f %f %f, %f %f %f %f", pos.x, pos.y, pos.z, ori.w, ori.x, ori.y, ori.z);
 
     //get map merger origin
     const exploration::pose * origin;
@@ -281,7 +281,7 @@ void map_merger_node::robot_1_pose_callback(const geometry_msgs::PoseStamped::Co
 
     pos = p.pose.position;
     ori = p.pose.orientation;
-    ROS_INFO("transformed to %f %f %f, %f %f %f %f", pos.x, pos.y, pos.z, ori.w, ori.x, ori.y, ori.z);
+    ROS_DEBUG("transformed to %f %f %f, %f %f %f %f", pos.x, pos.y, pos.z, ori.w, ori.x, ori.y, ori.z);
 
     //assign to list of poses
     robot_poses[1] = p;
@@ -292,8 +292,16 @@ void map_merger_node::robot_1_pose_callback(const geometry_msgs::PoseStamped::Co
 
 void map_merger_node::publish_pose(const geometry_msgs::PoseStamped& pose, const ros::Publisher& pub)
 {
+    publish_pose(pose, frame_name, pub);
+}
+
+void map_merger_node::publish_pose(
+    const geometry_msgs::PoseStamped& pose,
+    const std::string& frame_id,
+    const ros::Publisher& pub)
+{
     auto p = pose;
-    p.header.frame_id = frame_name;
+    p.header.frame_id = frame_id;
     p.header.stamp = ros::Time::now();
     if (merger.origins_are_initialized()) {
         pub.publish(p);
@@ -450,17 +458,18 @@ void map_merger_node::goal_list_callback(const nav_msgs::PathConstPtr& msg)
             continue;
         }
 
-        //transform pose according to its respective map merger origin
+        // transform pose according to its respective map merger origin
         transform_pose_stamped_to_local_map_frame(p, origin);
+        std::string frame_id = merger.get_map_frame_id(i);
 
         for (size_t a = 0; a < 5; a++) {
             //publish goal
             switch (i) {
             case 0:
-                publish_pose(p, robot_0_goal_publisher);
+                publish_pose(p, frame_id, robot_0_goal_publisher);
                 break;
             case 1:
-                publish_pose(p, robot_1_goal_publisher);
+                publish_pose(p, frame_id, robot_1_goal_publisher);
             default:
                 break;
             }
