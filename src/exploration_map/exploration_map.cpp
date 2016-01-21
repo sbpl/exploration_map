@@ -6,11 +6,10 @@
  */
 
 #include <exploration_map/exploration_map/exploration_map.h>
-#include <exploration_map/exploration_map/exploration_map.hpp>
 
-template class generic_map<exploration_type> ;
-template class generic_map<int> ;
-template class generic_map<double> ;
+template class generic_map<exploration_type>;
+template class generic_map<int>;
+template class generic_map<double>;
 
 int exploration::exploration_map::discretize(double s, double res)
 {

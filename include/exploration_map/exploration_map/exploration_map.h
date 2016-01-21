@@ -471,6 +471,8 @@ private:
 
 };
 
-}
+} // namespace exploration
+
+#include <exploration_map/exploration_map/exploration_map.hpp>
 
 #endif /* EXPLORATION_MAP_H_ */
