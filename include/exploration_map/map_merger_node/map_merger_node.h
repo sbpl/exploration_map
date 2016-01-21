@@ -1,9 +1,11 @@
-/*
- * map_merger_node.h
- *
- *  Created on: Oct 22, 2014
- *      Author: bmacallister
- */
+////////////////////////////////////////
+///
+/// map_merger_node.h
+///
+///  Created on: Oct 22, 2014
+///      Author: bmacallister
+///
+////////////////////////////////////////
 
 #ifndef MAP_MERGER_NODE_H_
 #define MAP_MERGER_NODE_H_
@@ -21,6 +23,7 @@
 #include <ros/time.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <tf/transform_listener.h>
+#include <tf/transform_broadcaster.h>
 
 #include <exploration_map/exploration_map/exploration_map.h>
 #include <exploration_map/map_merger/map_merger.h>
@@ -48,6 +51,7 @@ private:
     void robot_1_pose_callback(const geometry_msgs::PoseStamped::ConstPtr & msg);
 
     void map_publish_callback(const ros::TimerEvent & event);
+    void transform_publish_callback(const ros::TimerEvent& event);
 
     void publish_point_cloud(const std::vector<pcl::PointXYZI> & points, const ros::Publisher & pub);
 
@@ -89,6 +93,8 @@ private:
 
     //config variables
     std::string frame_name;
+    bool m_publish_transforms;
+    double m_transform_publish_rate;
     double map_resolution;
     double map_origin_x;
     double map_origin_y;
@@ -114,21 +120,21 @@ private:
 
     bool m_publish_inner_maps;
 
-    //ros node handlers
+    // ros node handlers
     ros::NodeHandle nh;
     ros::NodeHandle ph;
 
-    //ros timer
+    // ros timer
     ros::Timer map_publish_timer;
 
-    //ros subscribers
+    // ros subscribers
     ros::Subscriber robot_0_map_subscriber;
     ros::Subscriber robot_1_map_subscriber;
     ros::Subscriber robot_0_pose_subscriber;
     ros::Subscriber robot_1_pose_subscriber;
     ros::Subscriber goal_list_subscriber;
 
-    //ros publishers
+    // ros publishers
     ros::Publisher map_publisher;
     ros::Publisher map_update_publisher;
     ros::Publisher map_0_publisher;
@@ -139,7 +145,10 @@ private:
     ros::Publisher robot_0_goal_publisher;
     ros::Publisher robot_1_goal_publisher;
 
-    //variables
+    ros::Timer transforms_publish_timer_;
+    tf::TransformBroadcaster broadcaster_;
+
+    // variables
     pcl::PointCloud<pcl::PointXYZI> map_0_point_cloud;
     pcl::PointCloud<pcl::PointXYZI> map_1_point_cloud;
     exploration::map_merger merger;

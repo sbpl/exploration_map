@@ -161,14 +161,6 @@ private:
     /// \name member variables
     /// @{
 
-    // TODO: feels bad to put ROS-related stuff in here, but the asynchronous
-    // nature of map_merger_node doesn't give much of a choice...maybe a new
-    // return code can be added to receive_map_update to reflect whether the
-    // offset between the two robots' maps was computed
-    // NOTE: this will have to be changed to a non-static transform broadcaster
-    // if/when we're dealing with more than two robots
-    tf2_ros::StaticTransformBroadcaster broadcaster_;
-
     map_merge_config config_;
     std::vector<generic_map<exploration_type>> maps_;
     std::vector<int> map_counter_;

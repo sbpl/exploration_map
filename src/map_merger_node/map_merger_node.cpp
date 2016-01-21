@@ -1,9 +1,11 @@
-/*
- * map_merger_node.cpp
- *
- *  Created on: Oct 22, 2014
- *      Author: bmacallister
- */
+////////////////////////////////////////
+///
+/// map_merger_node.cpp
+///
+///  Created on: Oct 22, 2014
+///      Author: bmacallister
+///
+////////////////////////////////////////
 
 #include <exploration_map/map_merger_node/map_merger_node.h>
 
@@ -57,7 +59,12 @@ void map_merger_node::setup_ros()
         throw std::runtime_error("Failed to retrieve some parameters from the param server");
     }
 
+    ph.param("publish_transforms", m_publish_transforms, true);
     ph.param("publish_inner_maps", m_publish_inner_maps, false);
+    if (m_publish_transforms) {
+        ph.param("transform_publish_rate", m_transform_publish_rate, 10.0);
+        ROS_INFO("Publishing transforms at %0.3f Hz", m_transform_publish_rate);
+    }
 
     ROS_INFO("frame %s", frame_name.c_str());
     ROS_INFO("map_resolution %f", map_resolution);
@@ -66,7 +73,12 @@ void map_merger_node::setup_ros()
     ROS_ERROR("map publish rate %f", map_publish_rate);
 
     //timers
-    map_publish_timer = ph.createTimer(ros::Duration(map_publish_rate), &map_merger_node::map_publish_callback, this);
+    map_publish_timer = ph.createTimer(ros::Rate(map_publish_rate), &map_merger_node::map_publish_callback, this);
+    if (m_publish_transforms) {
+        transforms_publish_timer_ = ph.createTimer(
+                ros::Rate(m_transform_publish_rate),
+                &map_merger_node::transform_publish_callback, this);
+    }
 
     //subscribers
     robot_0_map_subscriber = nh.subscribe(robot_0_map_name.c_str(), 100, &map_merger_node::robot_0_map_callback, this);
@@ -89,7 +101,7 @@ void map_merger_node::setup_ros()
 
 void map_merger_node::map_publish_callback(const ros::TimerEvent& event)
 {
-    //publish map 0 and 1 for debugging purposes
+    // publish map 0 and 1 for debugging purposes
     if (m_publish_inner_maps) {
         this->publish_inner_maps();
     }
@@ -104,6 +116,38 @@ void map_merger_node::map_publish_callback(const ros::TimerEvent& event)
 
         //publish robot poses
         publish_robot_poses();
+    }
+}
+
+void map_merger_node::transform_publish_callback(const ros::TimerEvent& event)
+{
+    if (merger.origins_are_initialized()) {
+        for (int i = 0; i < number_of_maps; ++i) {
+            // NOTE: the naming conventions are inconsistent with other parts of
+            // of ROS here. It turns out the merged_map frame is actually
+            // coincident with the map frame of the first robot. The 'origin'
+            // here represents the min point of the bounding box of points.
+            tf::Transform T_world_master(tf::Transform::getIdentity());
+//                    tf::Quaternion::getIdentity(),
+//                    tf::Vector3(-map_origin_x, -map_origin_y, -map_origin_z));
+
+            const pose* origin = nullptr;
+            if (!merger.get_origin(i, origin) || !origin) {
+                ROS_ERROR("Failed to get origin for robot %d", i);
+                continue;
+            }
+            tf::Transform T_master_robotmap(
+                    tf::Quaternion(origin->ori.x, origin->ori.y, origin->ori.z, origin->ori.w),
+                    tf::Vector3(origin->pos.x, origin->pos.y, origin->pos.z));
+
+            tf::StampedTransform T_world_robotmap(
+                    T_world_master * T_master_robotmap,
+                    ros::Time::now(),
+                    frame_name,
+                    merger.get_map_frame_id(i));
+
+            broadcaster_.sendTransform(T_world_robotmap);
+        }
     }
 }
 

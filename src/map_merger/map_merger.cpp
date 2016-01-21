@@ -336,21 +336,6 @@ void exploration::map_merger::generate_initial_transforms()
     for (size_t i = 1; i < map_origins_.size(); i++) {
         map_origins_[i] = best_origin_list[i - 1];
         ROS_INFO("map_origins %d is %f %f %f", (int ) i, map_origins_[i].pos.x, map_origins_[i].pos.y, map_origins_[i].pos.z);
-
-        ROS_WARN("Broadcasting transform from master map '%s' to map '%s'", map_frame_ids_[0].c_str(), map_frame_ids_[i].c_str());
-        geometry_msgs::TransformStamped transform;
-        transform.header.seq = 0;
-        transform.header.stamp = ros::Time(0);
-        transform.header.frame_id = map_frame_ids_[0]; //"map"; //config_.map_config_...
-        transform.child_frame_id = map_frame_ids_[i];
-        transform.transform.translation.x = best_origin_list[i - 1].pos.x;
-        transform.transform.translation.y = best_origin_list[i - 1].pos.y;
-        transform.transform.translation.z = best_origin_list[i - 1].pos.z;
-        transform.transform.rotation.w = best_origin_list[i - 1].ori.w;
-        transform.transform.rotation.x = best_origin_list[i - 1].ori.x;
-        transform.transform.rotation.y = best_origin_list[i - 1].ori.y;
-        transform.transform.rotation.z = best_origin_list[i - 1].ori.z;
-        broadcaster_.sendTransform(transform);
     }
 }
 
