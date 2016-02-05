@@ -253,7 +253,7 @@ bool exploration_map_node::get_latest_pose_from_tf(
     // future...going to use the latest time for now, but perhaps this may
     // warrant a special case for sim depending on live behavior, and could be
     // encapsulated via a 'transform_policy' parameter
-    input_pose.header.stamp = ros::Time(0); // time;
+    input_pose.header.stamp = time; //ros::Time(0); // time;
     input_pose.pose.position.x = 0;
     input_pose.pose.position.y = 0;
     input_pose.pose.position.z = 0;
