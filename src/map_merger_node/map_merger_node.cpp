@@ -136,12 +136,12 @@ void map_merger_node::transform_publish_callback(const ros::TimerEvent& event)
                 ROS_ERROR("Failed to get origin for robot %d", i);
                 continue;
             }
-            tf::Transform T_master_robotmap(
+            tf::Transform T_master_robotmap( // master -> robot or robot -> master? dunno
                     tf::Quaternion(origin->ori.x, origin->ori.y, origin->ori.z, origin->ori.w),
                     tf::Vector3(origin->pos.x, origin->pos.y, origin->pos.z));
 
             tf::StampedTransform T_world_robotmap(
-                    T_world_master * T_master_robotmap,
+                    T_world_master * T_master_robotmap.inverse(),
                     ros::Time::now(),
                     frame_name,
                     merger.get_map_frame_id(i));
