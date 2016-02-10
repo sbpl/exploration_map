@@ -253,7 +253,7 @@ bool exploration_map_node::get_latest_pose_from_tf(
     // future...going to use the latest time for now, but perhaps this may
     // warrant a special case for sim depending on live behavior, and could be
     // encapsulated via a 'transform_policy' parameter
-    input_pose.header.stamp = time; //ros::Time(0); // time;
+    input_pose.header.stamp = time;
     input_pose.pose.position.x = 0;
     input_pose.pose.position.y = 0;
     input_pose.pose.position.z = 0;
@@ -263,6 +263,10 @@ bool exploration_map_node::get_latest_pose_from_tf(
     input_pose.pose.orientation.z = 0;
 
     try {
+        if (!listener.waitForTransform(frame_name, pose_name, time, ros::Duration(0.2))) {
+            ROS_WARN("Failed to wait for transform from '%s' to '%s'", frame_name.c_str(), pose_name.c_str());
+            return false;
+        }
         listener.transformPose(frame_name, input_pose, pose);
     }
     catch (tf::TransformException &e) {
