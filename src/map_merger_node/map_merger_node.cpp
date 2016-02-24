@@ -479,14 +479,14 @@ void map_merger_node::transform_pose_stamped_to_master_map_frame(
     geometry_msgs::PoseStamped& pose,
     const exploration::pose* origin)
 {
-    transform_pose_stamped_with_origin(pose, origin, false);
+    transform_pose_stamped_with_origin(pose, origin, true);
 }
 
 void map_merger_node::transform_pose_stamped_to_local_map_frame(
     geometry_msgs::PoseStamped& pose,
     const exploration::pose* origin)
 {
-    transform_pose_stamped_with_origin(pose, origin, true);
+    transform_pose_stamped_with_origin(pose, origin, false);
 }
 
 void map_merger_node::goal_list_callback(const nav_msgs::PathConstPtr& msg)
