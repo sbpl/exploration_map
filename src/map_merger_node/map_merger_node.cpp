@@ -506,20 +506,15 @@ void map_merger_node::goal_list_callback(const nav_msgs::PathConstPtr& msg)
         transform_pose_stamped_to_local_map_frame(p, origin);
         std::string frame_id = merger.get_map_frame_id(i);
 
-//        for (size_t a = 0; a < 5; a++)
-        {
-            //publish goal
-            switch (i) {
-            case 0:
-                publish_pose(p, frame_id, robot_0_goal_publisher);
-                break;
-            case 1:
-                publish_pose(p, frame_id, robot_1_goal_publisher);
-            default:
-                break;
-            }
-
-//            ros::Duration(1.0).sleep();
+        //publish goal
+        switch (i) {
+        case 0:
+            publish_pose(p, frame_id, robot_0_goal_publisher);
+            break;
+        case 1:
+            publish_pose(p, frame_id, robot_1_goal_publisher);
+        default:
+            break;
         }
     }
 }
